@@ -6,7 +6,6 @@ import regex as re
 
 # Downloading of Genome Report
 def download_report():
-    # Using requests-library, https://pypi.org/project/requests/
     url = "ftp://ftp.ncbi.nlm.nih.gov/genomes/GENOME_REPORTS/prokaryotes.txt"
     genome_report = urlopen(url)
     return genome_report.read().decode('utf-8')
@@ -25,7 +24,6 @@ def get_genome_info(genome_report, regex_list):
             if columns[15] != 'Complete Genome':
                 continue
 
-
             # Extract Organism Name and Genome_length in Mb
             organism_name = columns[0]
             genome_length = float(columns[6])
@@ -38,13 +36,13 @@ def get_genome_info(genome_report, regex_list):
 
 
 def main():
-    genome_report = download_report()
-
     # Argument-Parsing
     parser = argparse.ArgumentParser(
         description="Search for fully sequenced genomes based on organism names and regex patterns.")
     parser.add_argument("--organism", nargs="+", help="Given Regex patterns", required=True)
     args = parser.parse_args()
+
+    genome_report = download_report()
 
     regex_list = args.organism
     genome_info = get_genome_info(genome_report, regex_list)
@@ -55,5 +53,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
