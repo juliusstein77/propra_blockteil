@@ -1,0 +1,12 @@
+9.1) 
+- ChIP-seq ist eine methode uir nestimmung von protein dna interaktionen
+=> Ziel von analyse von chip-seq daten ist dna-protein interaktionen zu erforschen
+- RNA-seq ist eine next gen sequenzing methode für die bestimmung der rna primärstrucktur im hochdurchsatz
+=> Ziel von analyse von rna-seq daten ist quantitative unterschiede in gene expression ywischen proben zu finden
+
+9.2)
+- zelllienie mit den meisten verschiededn antikörpern: K562 mit 168
+- NFKB ist ein transkriptionsfactor und heißt in langform nuclear factor 'kappa-light-chain-enhancer' of activated B-cells und kommit in fast allen tiereschen zelltypen vor
+- Pol2 ist das enzym rna-polymerase 2 
+- H3K27me3 ist ein antikörper der spezifisch das dreifach methylierte Lysin 27 im Histon 3 erkennt
+

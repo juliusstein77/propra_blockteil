@@ -41,6 +41,8 @@ def main():
     df = create_dataframe_from_csv(args.input[0])
     dict_to_tsv(unique_antibodies_per_cell_line(df), args.output[0]+"/antibodies.tsv") # Aufgabe 9.2
 
+    print(unique_antibodies_per_cell_line(df).sort_values(ascending=False));
+
 
    
     
