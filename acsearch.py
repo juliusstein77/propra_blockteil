@@ -27,13 +27,11 @@ def main():
     # argparser to parse the accession number
     parser = argparse.ArgumentParser(description='Fetch sequence from UniProt.')
     # add the accession number as an argument
-    parser.add_argument('--ac', metavar='ACCESSION_NUMBER', required=True,
-                        help='Accession number of the UniProt sequence to fetch')
+    parser.add_argument('--ac', metavar='ACCESSION_NUMBER', required=True, help='Accession number of the UniProt sequence to fetch')
     # parse the arguments
     args = parser.parse_args()
 
     fasta_sequence = fetch_swissprot_sequence(args.ac)
-    # print the fasta sequence
     print(fasta_sequence)
 
 if __name__ == "__main__":
