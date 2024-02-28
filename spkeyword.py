@@ -18,24 +18,15 @@ def search_swissprot(keywords, filename):
                 entry_ac = set()  # Reset entry AC when encountering a new entry
             # If inside an entry and the line starts with 'AC', store the AC numbers
             elif line.startswith('AC'):
-                #print(line)
-
                 ac_line = line.split("AC", 1)[1].strip()  # Split the line and remove leading/trailing whitespace
                 ac_ids = ac_line.split(";")  # Split the accession numbers separated by ';'
                 ac_ids = [ac.strip() for ac in ac_ids if ac.strip()]
-
-                #entry_ac_temp = line.split("AC", 1)[1].split(";")
-                #entry_ac_temp = [e.strip() for e in entry_ac if e.strip()]  # Strip whitespace from each entry and filter out empty entries
-
-                #print(ac_ids)
                 entry_ac.update(ac_ids)
             # If inside an entry and the line starts with 'KW', check for keywords
             elif entry_ac and line.startswith('KW'):
-                #print(line)
                 kw_temp = line.split("KW", 1)[1].strip()  # Split the line and remove leading/trailing whitespace
                 kw_temp = kw_temp.split(";")  # Split the keywords separated by ';'
                 keywords_list = [kw.strip().rstrip('.') for kw in kw_temp]
-                #print(keywords_list)
                 for keyword in keywords:
                     # If the whole keyword is found in the line, add the entry AC to the results set
                     if keyword in keywords_list:
@@ -53,7 +44,7 @@ def main():
     # Add the swissprot file as an argument
     parser.add_argument('--swissprot', metavar='swissprot_file', type=str, required=True,
                         help='SwissProt data file')
-    # Parse the arguments
+
     args = parser.parse_args()
 
     keywords = args.keyword
@@ -61,7 +52,6 @@ def main():
 
     found_entries = search_swissprot(keywords, filename)
 
-    # Print the results
     for entry in found_entries:
         print(entry)
 
