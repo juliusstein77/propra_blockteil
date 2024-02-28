@@ -18,6 +18,7 @@ def load_sequence_from_fasta(fasta_file):
                 sequences[current_id] += line.strip()
     return sequences
 
+
 def main(path_to_fasta: str, sequences: list):
     genome_seq = load_sequence_from_fasta(path_to_fasta)
     print("Tatsächliches vorkommen der seqs")
@@ -33,6 +34,7 @@ def main(path_to_fasta: str, sequences: list):
                 
     for seq, count in seq_cont_dict.items():
         print(seq, count)
+    
     ###################################################
     # CALCULATIONS                                    #
     ###################################################
