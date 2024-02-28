@@ -2,6 +2,9 @@
 import argparse
 from urllib.request import urlopen
 import regex as re
+COMPLETE_GENOME_COL = 15
+ORGANISM_NAME_COL = 0
+GENOME_LEN_COL = 6
 
 
 # Downloading of Genome Report
@@ -19,19 +22,18 @@ def get_genome_info(genome_report, regex_list):
             continue
 
         columns = line.split("\t")
-        if len(columns) >= 15:
-            # Check, if its completely sequenced
-            if columns[15] != 'Complete Genome':
-                continue
+        # Check, if its completely sequenced
+        if columns[COMPLETE_GENOME_COL] != 'Complete Genome':
+            continue
 
-            # Extract Organism Name and Genome_length in Mb
-            organism_name = columns[0]
-            genome_length = float(columns[6])
+        # Extract Organism Name and Genome_length in Mb
+        organism_name = columns[ORGANISM_NAME_COL]
+        genome_length = float(columns[GENOME_LEN_COL])
 
-            for regex in regex_list:
-                if re.search(regex, organism_name):
-                    genome_info.append((organism_name, genome_length))
-                    break
+        for regex in regex_list:
+            if re.search(regex, organism_name):
+                genome_info.append((organism_name, genome_length))
+                break
     return genome_info
 
 
