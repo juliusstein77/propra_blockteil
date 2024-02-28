@@ -5,7 +5,7 @@ import pandas as pd
 from utils import create_dataframe_from_csv, read_lines, dict_to_tsv, strip_exp_factor, series_to_tsv
 
 # line in lines: Data_Type,Cell_Type,Experimental_Factors,Treatment,Lab,PI,Assembly,Status,GEO_Accession,DCC_Accession,Date_Unrestricted
-import pandas as pd
+
 
 
 
@@ -41,7 +41,7 @@ def main():
     df = create_dataframe_from_csv(args.input[0])
     dict_to_tsv(unique_antibodies_per_cell_line(df), args.output[0]+"/antibodies.tsv") # Aufgabe 9.2
 
-    print(unique_antibodies_per_cell_line(df).sort_values(ascending=False));
+   
 
 
    
