@@ -24,9 +24,12 @@ def dict_to_tsv(dictionary, output):
         for key, value in dictionary.items():
             file.write(f"{key}\t{value}\n")
 
-def strip_exp_factor(exp_factor, tgt_exp_factor_type):
-    print(exp_factor)   
-    exp_factor = (exp_factor.split(' ')[0]).split('=')
+def strip_exp_factor(exp_factor, tgt_exp_factor_type, ignore_version=False):  
+    if ignore_version:
+        exp_factor = (exp_factor.split(' ')[0]).split('=')
+    else:
+        exp_factor = exp_factor.split('=')
+        
     exp_factor_type = exp_factor[0]
     exp_factor_value = exp_factor[1]
     if exp_factor_type.lower() == tgt_exp_factor_type.lower():

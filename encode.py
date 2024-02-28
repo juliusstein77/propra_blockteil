@@ -2,7 +2,7 @@
 import argparse
 import pandas as pd
 
-from utils import read_lines, dict_to_tsv, strip_exp_factor
+from utils import create_dataframe_from_csv, read_lines, dict_to_tsv, strip_exp_factor
 
 # line in lines: Data_Type,Cell_Type,Experimental_Factors,Treatment,Lab,PI,Assembly,Status,GEO_Accession,DCC_Accession,Date_Unrestricted
 import pandas as pd
@@ -35,6 +35,15 @@ def main():
 
     df = create_dataframe_from_csv(args.input[0])
 
+
+    df = df[df['Experimental_Factors'].str.contains('Antibody')]
+    df['Experimental_Factors'] = df['Experimental_Factors'].apply(lambda x: strip_exp_factor(x, 'antibody', True)) #alle records mit antikörper
+    
+    chip_df = df[df['Data_Type'].str.contains('ChIP-seq', case=False, na=False)]
+    antibodies_per_cell_line = chip_df.groupby('Cell_Type')['Experimental_Factors'].nunique().reset_index()
+
+    print(antibodies_per_cell_line)
+    
 
     
 
