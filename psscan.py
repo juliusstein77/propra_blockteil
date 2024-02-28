@@ -12,11 +12,10 @@ import requests
 def prosite_to_regex(prosite_pattern):
     # Convert Prosite pattern to a regular expression pattern
     regex_pattern = prosite_pattern.replace('[', '[').replace(']',']').replace('{', '[^').replace('}', ']').replace('(', '{').replace(')', '}').replace('<', '').replace('>', '')
-
     # Replace individual characters with regular expression equivalents
     regex_pattern = regex_pattern.replace('x', '.').replace('-', '').replace('*', '.*')
+    # Add lookahead and lookbehind assertions to the pattern -> necessary for overlapping matches
     regex_pattern = '(?=(' + regex_pattern + '))'
-    #print(regex_pattern)
     return regex_pattern
 
 def find_pattern_matches(pattern, sequence, sequence_id):
@@ -32,6 +31,7 @@ def find_pattern_matches(pattern, sequence, sequence_id):
         results.append((sequence_id, start_position, matched_sequence))
     return results
 
+# Load sequences from a FASTA file
 def load_sequence_from_fasta(fasta_file):
     sequences = {}
     current_id = ''
@@ -93,15 +93,12 @@ def main():
     group.add_argument('--pattern', metavar='pattern', type=str, help='Prosite pattern to search for')
     group.add_argument('--web', metavar='prosite_id', type=str, help='PROSITE ID to load the pattern from the Prosite website')
     parser.add_argument('--extern', action='store_true', help='Scan von der Prosite Webseite durchführen lassen (Bonus)')
-
-    #parser.add_argument('--pattern', metavar='pattern', type=str, required=True, help='Prosite pattern to search for')
     parser.add_argument('--fasta', metavar='fasta_file', type=str, required=True, help='FASTA file containing the sequences')
-    #parser.add_argument('--web', metavar='prosite_id', type=str, help='PROSITE ID to load the pattern from the Prosite website')
+
     args = parser.parse_args()
 
     pattern = args.pattern
 
-    #print(pattern)
     fasta_file = args.fasta
 
     if args.web:
@@ -122,7 +119,6 @@ def main():
     # Print the found matches
     for match in all_matches:
         print(f"{match[0]}\t{match[1]}\t{match[2]}")
-
 
 if __name__ == "__main__":
     main()
