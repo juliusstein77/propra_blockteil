@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 import argparse
 
-CRISPR_LENGTH = 23
+TRACRRNA_LENGTH = 3
+CRISPR_SEQ_LENGTH = 20
 MOTIF = 'GG'
 
 
@@ -26,7 +27,7 @@ def read_crispr_out_of_fasta(fasta_file):
 
 def get_crispr(seq, record_name):
     crispr_seqs = []
-    n = CRISPR_LENGTH - len(MOTIF)
+    n = TRACRRNA_LENGTH + CRISPR_SEQ_LENGTH - len(MOTIF)
 
     for i in range(len(seq) - n):
         subseq = seq[i : i + n]
