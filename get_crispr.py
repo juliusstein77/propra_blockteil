@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import argparse
-import re
 
 CRISPR_LENGTH = 23
 MOTIF = 'GG'
