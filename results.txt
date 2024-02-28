@@ -1,7 +1,23 @@
-1.
+1. Annahme, Gleiche Verteilung an ACGT:
 p(CTAG) -> p^4 = 1 / 256 = 0.00390625
 p(CG) -> p^2 = 1 / 16 = 0.0625
 p(AACCCTGTC) -> p^9 = 0.0000038146972656
 p(ATG) -> p^3 = 1/64 = 0.015625
 
-n(bases, )
+n(bases, Mycobacterium tuberculosis) = 
+n(bases, Chromosom 8 des Menschen) = 
+
+p(CTAG, Myco) =
+p(CG, Myco)
+p(AACCCTGTC, Myco) =
+p(ATG, Myco) =
+
+p(CTAG, Ch8) =
+p(CG, Ch8)
+p(AACCCTGTC, Ch8) =
+p(ATG, Ch8) =
+
+2. rH für A, C, G, T 
+
+Fehlerwahrscheinlichkeit = 1 - =
+
