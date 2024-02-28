@@ -23,6 +23,13 @@ def dict_to_tsv(dictionary, output):
     with open(output, 'w') as file:
         for key, value in dictionary.items():
             file.write(f"{key}\t{value}\n")
+            
+def series_to_tsv(sr, output):
+    with open(output, "w") as file:
+        for key, value in sr.items():
+            file.write(str(key) + "\t" + str(value) + "\n")
+
+
 
 def strip_exp_factor(exp_factor, tgt_exp_factor_type, ignore_version=False):  
     if ignore_version:
@@ -36,3 +43,4 @@ def strip_exp_factor(exp_factor, tgt_exp_factor_type, ignore_version=False):
         return exp_factor_value
     else:
         return None
+    
