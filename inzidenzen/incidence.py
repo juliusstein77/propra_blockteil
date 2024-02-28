@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import argparse
 import re
 
@@ -14,10 +15,19 @@ def read_genome(path):
 
 def main(path_to_fasta: str, sequences: list):
     genome_seq = read_genome(path_to_fasta)
+    # print(genome_seq)
+    # print(set(genome_seq))
+    # print(len(set(genome_seq)))
     for seq in sequences:
-        print(seq)
-    # pattern = r'(?=())'
-    # match = re.search(pattern, text)
+        pattern = rf'(?=({seq}))'
+        matches = re.finditer(pattern, genome_seq)
+        m_count = 0
+
+        for m in matches:
+            m_count+=1
+            
+        print(f'{seq}: {m_count}')
+
 
 
 if __name__ == "__main__":
