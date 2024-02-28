@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import argparse
+import re
 
 CRISPR_LENGTH = 23
 MOTIF = 'GG'
@@ -12,24 +13,27 @@ def read_crispr_out_of_fasta(fasta_file):
         crispr_seqs = []
         for line in f:
             if line.startswith('>'):
-                if seq:  # Skip the get_crispr for first line
+                if seq:  # Skip first call
                     crispr_seqs.extend(get_crispr(seq, record_name))
                     seq = ''
                 record_name = line.strip()
             else:
                 seq += line.strip()
-            if seq:  # Check for the last sequence
-                crispr_seqs.extend(get_crispr(seq, record_name))
+        # Last Sequence Call
+        if seq:
+            crispr_seqs.extend(get_crispr(seq, record_name))
         return crispr_seqs
 
 
 def get_crispr(seq, record_name):
     crispr_seqs = []
     n = CRISPR_LENGTH - len(MOTIF)
-    for i in range(len(seq) - len(MOTIF) - n + 1):
-        if seq[i: i + n] + MOTIF == seq[i: i + n + len(MOTIF)]:
-            start = i + n + 1
-            crispr_seqs.append((record_name, start, seq[i: i + n + len(MOTIF)]))
+
+    for i in range(len(seq) - n):
+        subseq = seq[i : i + n]
+        if subseq + MOTIF == seq[i : i + n + len(MOTIF)]:
+            start = i + 1
+            crispr_seqs.append((record_name, start, subseq + MOTIF))
     return crispr_seqs
 
 
