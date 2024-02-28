@@ -25,7 +25,7 @@ def unique_antibodies_per_cell_line(df):
     df.loc[:,'Experimental_Factors'] = df['Experimental_Factors'].apply(lambda x: strip_exp_factor(x, 'antibody', True)) #alle records mit antikörper
     chipseq_factors = set(df[df['Data_Type'] == 'ChIP-seq']['Experimental_Factors'].str.split(',').explode()) #all chip seq antibodies
     df.loc[:,'Has_ChIP_Seq_Antibody'] = df['Experimental_Factors'].apply(lambda x: any([a in x for a in chipseq_factors])) #alle records mit chip seq antikörper
-    unique_antibodies_per_cell_line = df[df['Has_ChIP_Seq_Antibody'] == True].groupby('Cell_Type')['Experimental_Factors'].nunique() #alle zelllinien mit chip seq antikörper
+    unique_antibodies_per_cell_line = df[df['Has_ChIP_Seq_Antibody'] == True].groupby('Cell_Type')['Experimental_Factors'].nunique() - 1 #alle zelllinien mit chip seq antikörper
     return unique_antibodies_per_cell_line
 
 
@@ -40,7 +40,7 @@ def main():
 
     df = create_dataframe_from_csv(args.input[0])
     dict_to_tsv(unique_antibodies_per_cell_line(df), args.output[0]+"/antibodies.tsv") # Aufgabe 9.2
-
+    print(unique_antibodies_per_cell_line(df).sort_values(ascending=False))
    
 
 
