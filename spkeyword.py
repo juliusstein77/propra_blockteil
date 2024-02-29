@@ -20,6 +20,7 @@ def search_swissprot(keywords, filename):
             elif line.startswith('AC'):
                 ac_line = line.split("AC", 1)[1].strip()  # Split the line and remove leading/trailing whitespace
                 ac_ids = ac_line.split(";")  # Split the accession numbers separated by ';'
+                # Remove leading/trailing whitespace from each accession number and add it to the entry AC set
                 ac_ids = [ac.strip() for ac in ac_ids if ac.strip()]
                 entry_ac.update(ac_ids)
             # If inside an entry and the line starts with 'KW', check for keywords
