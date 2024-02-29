@@ -63,7 +63,7 @@ def run_jmol(script_file):
     :script_file: path to the created script 
     """
     # Command to run Jmol with the specified script file
-    command = ["java", "-jar", "Jmol.jar", "-s", script_file, "--exit"]
+    command = ["java", "-jar", "Jmol.jar", "-s", script_file, "-n"]
     # " id.pbd -w .... --n -j 'cartoon only;color chain'"
 
     # Run the command
