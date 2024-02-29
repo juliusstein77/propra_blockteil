@@ -1,0 +1,38 @@
+# Programmierpraktikum WS2023/2024
+# 240229
+# Uebungsblatt 2, Aufgabe 12 (Blast)
+# Julius J. Stein
+
+Das Blast Kommandozeilentool wurde auf host jaspis (Amalienstr.) verwendet (Software/blast-2.8.1).
+Index-Dateien von "Mycoplasma_genitalum_protein.faa" in /mnt/biocluster/praktikum/bioprakt/Data/Genomes
+auf host jaspis wurden mit folgendem Befehl erstellt:
+
+```bash
+makeblastdb -in Mycoplasma_genitalum_protein.faa -dbtype prot -out Mycoplasma_genitalium_db
+```
+Dieser Befehl erstellt eine Datenbank mit dem Namen "Mycoplasma_genitalium_db" aus der Datei "Mycoplasma_genitalum_protein.faa".
+Es werden die Index-Dateien "Mycoplasma_genitalium_db.phr", "Mycoplasma_genitalium_db.pin" und "Mycoplasma_genitalium_db.psq" erstellt.
+Mycoplasma_genitalium_db.phr enthält die Indexinformationen für die Proteine, die in der BLAST-Datenbank enthalten sind.
+Sie wird von BLAST verwendet, um den Zugriff auf die Sequenzen in der Datenbank zu beschleunigen, indem sie Informationen über die Positionen und Längen der Sequenzen enthält.
+Mycoplasma_genitalium_db.pin enthält die Indexinformationen für die Sequenzen in der BLAST-Datenbank.
+Sie speichert Informationen über die Sequenzpositionen und -längen.
+Mycoplasma_genitalium_db.psq: Diese Datei enthält die Sequenzdaten selbst, die in der BLAST-Datenbank gespeichert sind.
+Sie enthält die eigentlichen Sequenzen, die für die BLAST-Suche verwendet werden.
+
+Als humane Proteinsequenz für die Suche im M. Genitalium Proteom wurde die Sequenz der humanen ribosomalen protein S6
+kinase A1 (RPS6KA1) verwendet.
+Die Sequenz wurde von UniProt (https://www.uniprot.org/uniprotkb/E9PPN6/entry#sequences) heruntergeladen.
+Die Sequenz ist für die Suche im M. Genitalium Proteom sinnvoll, da sie eine einen hohen grad an Konservierung/Homologie
+über verschiedene Arten (einschliesslich Bakterien) hinweg aufweist. RPS6KA1 ist zudem gut charakterisiert und hat
+zahlreiche bekannte Funktionen und Interaktionen.
+RPS6KA1 ist eine Serin/Threonin-Proteinkinase, die eine wichtige Rolle bei Zellwachstum, Proliferation und Überleben spielt.
+
+Die Blast Suche wurde mit folgenden Befehlen durchgeführt:
+
+```bash
+blastp -query E9PPN6.fasta -db Mycoplasma_genitalium_db -outfmt 5 -out blast_result.xml
+blastp -query E9PPN6.fasta -db Mycoplasma_genitalium_db -outfmt 6 -out blast_result.tsv
+blastp -query E9PPN6.fasta -db Mycoplasma_genitalium_db -outfmt "6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" -out blast_result.tsv
+```
+Der erste Befehl gibt die Ergebnisse im XML Format aus, der zweite Befehl im tab-separierten Format.
+Mit dem dritten Befehl werden nur die Spalten qseqid, sseqid, pident, length, mismatch, gapopen, qstart, qend, sstart, send, evalue und bitscore ausgegeben (custom Formatierung).
