@@ -2,3 +2,4 @@ data/*
 out/*
 jsmol/*
 __pycache__
+jmol_script.spt
