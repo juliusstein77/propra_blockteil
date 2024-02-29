@@ -15,3 +15,26 @@ parser.add_argument('--id', type=str, help='Id of Sequenc')
 parser.add_argument('--source', type=str, help='Input Source of Sequence')
 args = parser.parse_args()
 
+select_string = "SELECT `id`, `sequence` FROM Sequences " \
+                "WHERE `id` in ("
+for id in args.id:
+    select_string += id
+    select_string += ","
+
+select_string = select_string[0:len(select_string)-1]
+select_string += ")"
+
+try:
+    # write in fasta file
+    cursor.execute(select_string)
+    with cnx.cursor() as cursor:
+        cursor.execute(select_string)
+        rows = cursor.fetchall()
+        
+finally:
+    cursor.close()
+    cnx.close()
+for row in rows:
+            print(">"+row[0])
+            print(row[1])
+
