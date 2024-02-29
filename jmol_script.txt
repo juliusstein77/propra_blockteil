@@ -1,7 +1,0 @@
-load data/100d.pdb
-select all
-wireframe off
-spacefill off
-cartoon on
-write PNG out/100d.png
-exit

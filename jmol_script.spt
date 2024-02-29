@@ -1,0 +1,5 @@
+load data/100d.pdb
+cartoon only
+color cartoon structure
+write PNG out.png
+exit
