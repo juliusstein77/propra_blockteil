@@ -8,7 +8,11 @@ import argparse
 import requests
 
 # download_pdb: Download PDB file for given PDB ID
-def download_pdb(pdb_id):
+def download_pdb(pdb_id, fasta):
+    if fasta:
+        fasta_url = f'https://www.rcsb.org/fasta/entry/{pdb_id}'
+        fasta_response = requests.get(fasta_url)
+        return fasta_response.text
     url = f'https://files.rcsb.org/download/{pdb_id}.pdb'
     response = requests.get(url)
     if response.status_code == 200:
@@ -36,12 +40,17 @@ def main():
     pdb_id = args.id
     output_file = args.output
 
-    pdb_content = download_pdb(pdb_id)
+    fasta = False
+    if args.fasta:
+        fasta = True
+
+    pdb_content = download_pdb(pdb_id, fasta)
+
     if pdb_content:
         if output_file=="-":
             print_to_console(pdb_content)
         else:
-            save_to_file(pdb_content, f'{output_file}/{pdb_id}_output.pdb')
+            save_to_file(pdb_content, f'{output_file}/{pdb_id}_output.fasta' if fasta else f'{output_file}/{pdb_id}_output.pdb')
 
 if __name__ == "__main__":
     main()
