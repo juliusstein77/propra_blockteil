@@ -1,8 +1,12 @@
 #!/usr/bin/python3
+# Programmierpraktikum WS2023/2024
+# Uebungsblatt 2, Aufgabe 9 (vizualize_mol)
+# Malte A. Weyrich
 
 import argparse
 import os
 import subprocess
+from subprocess import DEVNULL
 import get_pdb
 
 DATADIR="data/"
@@ -63,7 +67,7 @@ def run_jmol(script_file):
     """
     
     command = ["java", "-jar", "Jmol.jar", "-s", script_file, "-n"]
-    subprocess.run(command)
+    subprocess.run(command, stdout=DEVNULL)
 
 
 def main(id: str, output: str, is_html: bool, is_color: bool):

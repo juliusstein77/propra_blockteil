@@ -1,5 +1,5 @@
-load data/1BAF.pdb
+load data/256b.pdb
 cartoon only
 color cartoon structure
-write PNG test/1BAF.png
+write PNG results/256b.png
 exit
