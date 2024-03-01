@@ -21,7 +21,6 @@ elif mode == "DROP":
   cursor.execute("DROP TABLE IF EXISTS Sequences")
   cursor.execute("DROP TABLE IF EXISTS Organisms")
   cursor.execute("DROP TABLE IF EXISTS Keywords")
-  cursor.execute("DROP TABLE IF EXISTS Proteins")
   cursor.execute("DROP TABLE IF EXISTS Alignments")
   cursor.execute("DROP TABLE IF EXISTS Homestrad")
   cursor.execute("SHOW TABLES")
