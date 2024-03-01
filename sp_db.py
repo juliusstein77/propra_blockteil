@@ -29,6 +29,7 @@ def insert_swissprot(swissprot):
         cursor.execute("INSERT INTO Sequences (type, sequence, source, source_id) VALUES (%s, %s, %s, %s)", (type, seq, source, source_id))
         cursor.execute("SELECT LAST_INSERT_ID()")
         sequence_id = cursor.fetchone()[0]
+        existing_keywords = []
 
     else:
         sequence_id = sequence_row[0]
