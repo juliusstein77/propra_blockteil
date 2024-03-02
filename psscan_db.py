@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Programmierpraktikum WS2023/2024
 # 240302
-# Uebungsblatt 2, Aufgabe 7 (Prosite-Pattern)
+# Uebungsblatt 2, Aufgabe 7 (Prosite-Patterns)
 # Julius J. Stein
 
 import re
