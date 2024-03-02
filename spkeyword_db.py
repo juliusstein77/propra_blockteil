@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Programmierpraktikum WS2023/2024
-# 240226
-# Uebungsblatt 1, Aufgabe 6 (Swissprot-Keyword)
+# 240302
+# Uebungsblatt 2, Aufgabe 6 (spkeyword in SQL)
 # Julius J. Stein
 
 import argparse
