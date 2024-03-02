@@ -9,9 +9,9 @@ import requests
 
 # download_pdb: Download PDB file for given PDB ID
 def download_pdb(pdb_id, fasta):
-    if fasta:
+    if fasta: # If fasta is True, download fasta file
         url = f'https://www.rcsb.org/fasta/entry/{pdb_id}'
-    else:
+    else: # If fasta is False, download pdb file
         url = f'https://files.rcsb.org/download/{pdb_id}.pdb'
     response = requests.get(url)
     if response.status_code == 200:
@@ -46,8 +46,10 @@ def main():
     pdb_content = download_pdb(pdb_id, fasta)
 
     if pdb_content:
+        # If output_file is not specified, print to console
         if output_file=="-":
             print_to_console(pdb_content)
+        # If output_file is specified, save to file
         else:
             save_to_file(pdb_content, f'{output_file}/{pdb_id}_output.fasta' if fasta else f'{output_file}/{pdb_id}_output.pdb')
 
