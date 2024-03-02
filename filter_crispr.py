@@ -53,7 +53,7 @@ def main():
     #if sam_input == '-':
     #    sam_input = sys.stdin
 
-    sam_data = parse_sam_file(sam_input)
+    sam_data = parse_sam_file(args.sam)
 
     filter_no_off_targets(sam_data, args.no_off_targets)
 
