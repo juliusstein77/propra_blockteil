@@ -1,0 +1,33 @@
+# Programmierpraktikum WS2023/2024
+# 240302
+# Uebungsblatt 2, Aufgabe 7 (Prosite-Pattern)
+# Julius J. Stein
+
+Vergleichen Sie Ihr Datenbank-basiertes Programm mit dem von Aufgabenblatt 1, vor allem bezueglich der Laufzeit.
+Erklaeren Sie die gefundenen Laufzeitunterschiede.
+
+When comparing the runtime of the database-based program with the one from Aufgabenblatt 1 for searching a Prosite pattern, there are several factors to consider.
+These are the results regarding Laufzeit we might expect and why:
+
+Database-based Program Expected to Have Longer Startup Time:
+Since the database-based program involves establishing a connection to the database and executing SQL queries,
+it is expected to have a longer startup time compared to the file-based program.
+This initial overhead can impact the overall runtime, especially for smaller datasets or simple pattern searches.
+
+Database-based Program May Have Faster Execution Time for Large Datasets:
+For large datasets, the database-based program may outperform the file-based program in terms of execution time.
+This is because databases are optimized for efficient data retrieval and filtering, especially when appropriate indexes are used.
+
+File-based Program May Have Better Performance for Small Datasets:
+Conversely, for smaller datasets, the file-based program may have better performance due to lower overhead.
+The database-based program incurs additional overhead related to database connection, query parsing, and result fetching,
+which may outweigh the benefits of using SQL queries for small datasets.
+
+Resource Utilization: The database-based program may consume more memory and CPU resources due to the overhead of maintaining a database connection and executing SQL queries.
+This increased resource usage can impact overall system performance, especially in resource-constrained environments.
+
+Complexity of the Prosite Pattern: The complexity of the Prosite pattern being searched can also influence the runtime difference between the two programs.
+If the pattern involves complex regular expressions or requires multiple database queries, it may lead to longer execution times for the database-based program.
+
+In summary, we expect the database-based program to have longer startup time but potentially faster execution time for large datasets, especially when optimized database queries are used.
+However, the file-based program may have better performance for smaller datasets due to lower overhead. The actual runtime difference will depend on various factors such as dataset size, pattern complexity, database optimization, and resource utilization.

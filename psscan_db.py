@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Programmierpraktikum WS2023/2024
-# 240226
-# Uebungsblatt 1, Aufgabe 7 (Prosite-Pattern)
+# 240302
+# Uebungsblatt 2, Aufgabe 7 (Prosite-Pattern)
 # Julius J. Stein
 
 import re
@@ -18,7 +18,7 @@ def search_sequences_db(db, pattern):
     sql_query = f"""
             SELECT id, REGEXP_SUBSTR(sequence, '{pattern}') AS matched_sequence
             FROM Sequences
-            WHERE sequence REGEXP '{pattern}'
+            WHERE sequence REGEXP '{pattern}' and type = 'protein';
         """
     # Execute SQL query
     cursor.execute(sql_query)
