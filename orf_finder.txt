@@ -1,0 +1,57 @@
+# Programmierpraktikum WS2023/2024
+# 240229
+# Uebungsblatt 2, Aufgabe 5 (Finding ORFs)
+# Julius J. Stein
+
+# Bestimmen der Laenge der Sequenz von sce_chr1.fasta
+grep -v "^>" sce_chr1.fasta | tr -d '\n' | wc -c
+output: 230218
+
+# Bestimmen des GC-Gehalts der Sequenz von sce_chr1.fna
+Python script gc_content.py
+GC content: 39.27017001277051
+
+# Erzeugen einer zufaelligen DNA-Sequenz mit einer Laenge von 230218 Basen und einem GC-Gehalt von 50%
+Python script random_sequence.py
+test50.fasta
+
+# Erstellen einer zufaelligen DNA-Sequenz mit einer Laenge von 230218 Basen und einem GC-Gehalt von 39.27017001277051%
+Python script random_sequence.py
+test39.fasta
+
+# Bestimmen des GC-Gehalts der Sequenz von test50.fasta (test)
+Python script gc_content.py
+GC content: 50.0
+
+# Bestimmen des GC-Gehalts der Sequenz von test39.fasta (test)
+Python script gc_content.py
+GC content: 39.27017001277051
+
+# Erzeugen der ORFs fuer alle 3 Sequenzen (sce_chr1.fna, test50.fasta, test39.fasta)
+Python script orf_fnder.py
+sce_chr1.fna -> sce_chr1_orfs.fasta
+test50.fasta -> test50_orfs.fasta
+test39.fasta -> test39_orfs.fasta
+
+Wie viele ORFs finden Sie, die fuer Proteine mit einer Laenge zwischen 76 und 100 AA kodieren?
+
+# Bestimmen der Anzahl an ORFs der Laenge 76-100 AA
+Python script orf_stat.py
+sce_chr1.fna -> Number of ORFs between 76 and 100 Amino Acids: 84
+test50.fasta -> Number of ORFs between 76 and 100 Amino Acids: 100
+test39.fasta -> Number of ORFs between 76 and 100 Amino Acids: 50
+
+Erstellen Sie ein Histogramm, dass die Anzahl an ORFs der Laenge 76-100 AA visualisiert. Waehlen Sie eine bin-Groeße von 5 AA.
+Python script orf_stat.py
+-> Siehe Histogramme
+orf_histogram_sce_chr1.png
+orf_histogram_test50.png
+orf_histogram_test39.png
+
+Reference:
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3454372/
+"Although the number and the typical length of ORFs may vary, bacteria share common characteristics of their open reading frame length distribution, which is correlated to their GC-content.
+Most ORFs are rather short. Investigating the statistical properties of a genome with GC-content 21.4%, we observe that 75% of all ORFs are shorter than 15 codons.
+On the other hand, only 0.1% of all ORFs have lengths larger than 779 codons.
+The same tendency holds for a genome with a high GC-content of 75.9%, in this case 75% of all ORFs are shorter than 195 codons and a minority of 0.1% are larger than 1854 codons (own data).
+It is a well-known fact that the distribution of the overall ORF lengths correlates with the GC-content of a genome, simply because stop codons being AT-rich."
