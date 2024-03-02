@@ -1,0 +1,18 @@
+For all 4 bacterias
+bowtie -x indexes/hg19 -v 3 -S -f ~/Desktop/crispr_Helicobacter_pylori.fast > ~/Desktop/sam_output_Heliobacter_pylori.txt
+
+For Escherichia coli:
+# reads with at least one alignment: 173576 (63.74%)
+# reads that failed to align: 98727 (36.26%)
+
+For Heliobacter pylori:
+# reads with at least one alignment: 63095 (84.54%)
+# reads that failed to align: 11535 (15.46%)
+
+For Mycobacterium tuberculosis:
+# reads with at least one alignment: 221267 (56.52%)
+# reads that failed to align: 170190 (43.48%)
+
+For Pseudomonas aeruginosa:
+# reads with at least one alignment: 320570 (65.83%)
+# reads that failed to align: 166364 (34.17%)
