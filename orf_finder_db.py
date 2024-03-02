@@ -8,22 +8,29 @@ import argparse
 import mysql.connector
 import re
 
+# Reverse complement of a DNA sequence
 def reverse_complement(seq):
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
     return ''.join(complement[base] for base in reversed(seq))
 
+# Find all open reading frames in a DNA sequence
 def find_orfs(sequence):
     orfs = []
     start_codon = 'ATG'
     stop_codons = ['TAA', 'TAG', 'TGA']
     seq_len = len(sequence)
 
+    # Iterate over all three reading frames
     for frame in range(3):
+        # boolean to keep track of whether a start codon has been found
         found_start = False
+        # Iterate over the sequence in steps of 3
         for i in range(frame, seq_len, 3):
+            # If a start codon is found and no start codon has been found before, set found_start to True and store the start index
             if sequence[i:i + 3] == start_codon and not found_start:
                 found_start = True
                 start_index = i
+            # If a stop codon is found and a start codon has been found before, store the stop index and add the ORF to the list
             if sequence[i:i + 3] in stop_codons and found_start:
                 stop_index = i
                 # Check if the start index lies within the boundaries of an existing ORF
@@ -33,7 +40,9 @@ def find_orfs(sequence):
 
     return [sequence[start:stop] for start, stop in orfs]
 
+# Extract sequences from a FASTA file
 def extract_sequences_from_fasta(fasta_file):
+    # Dictionary to store the sequences and their names
     sequences = {}
     with open(fasta_file, 'r') as f:
         current_sequence = None
@@ -45,6 +54,7 @@ def extract_sequences_from_fasta(fasta_file):
                 sequences[current_sequence] += line.strip()
     return sequences
 
+# Write sequences to a FASTA file
 def write_to_fasta(sequences, output_file):
     with open(output_file, 'w') as f:
         for seq_name, seq in sequences.items():
@@ -69,7 +79,7 @@ def main():
 
     output_sequences = {}
 
-
+    # Connect to the database
     db = mysql.connector.connect(
         host="localhost",
         user="bioprakt3",
@@ -78,10 +88,13 @@ def main():
         port="3307"
     )
 
+    # Iterate over all sequences and find ORFs
     for seq_name, seq in sequences.items():
+        # Find ORFs in the sequence and its reverse complement
         orfs = find_orfs(seq)
         orfs_reverse = find_orfs(reverse_complement(seq))
 
+        # Store the ORFs in a list
         all_orfs = []
         for orf in orfs:
             all_orfs.append(orf)

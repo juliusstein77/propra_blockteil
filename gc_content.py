@@ -6,12 +6,14 @@
 
 import sys
 
+# Calculate the GC content of a DNA string
 def calculate_gc_content(dna_string):
     total_bases = len(dna_string)
     gc_bases = dna_string.count('G') + dna_string.count('C')
     gc_content = (gc_bases / total_bases) * 100
     return gc_content
 
+# Parse a FASTA file and return a list of tuples containing the label and the DNA sequence
 def parse_fasta_file(file_path):
     strings = []
     current_label = ""
@@ -33,6 +35,7 @@ def parse_fasta_file(file_path):
 
     return strings
 
+# Find the DNA string with the highest GC content in a FASTA file
 def find_highest_gc_content(file_path):
     strings = parse_fasta_file(file_path)
     highest_gc_content = 0
@@ -56,10 +59,3 @@ if __name__ == "__main__":
 
     print("Label with the highest GC content:", result[0])
     print("GC content:", result[1])
-
-# Example usage
-#input_fasta_file = 'rosalind_gc.txt'
-
-#result = find_highest_gc_content(input_fasta_file)
-#print(result[0])
-#print(result[1])
