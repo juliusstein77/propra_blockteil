@@ -5,24 +5,3 @@
 1MBN	Y-Groesse	38.9000
 1MBN	Z-Groesse	38.9000
 1MBN	Volumen	64614.0670
-1BAF	Anteil AS in Sekundaerstruktur	1.3088
-1BAF	Abstand C_alpha	64.8571
-1BAF	Abstand C_beta	67.0044
-1BAF	X-Groesse	60.9250
-1BAF	Y-Groesse	73.3050
-1BAF	Z-Groesse	52.4900
-1BAF	Volumen	234425.9630
-1TIM	Anteil AS in Sekundaerstruktur	1.0202
-1TIM	Abstand C_alpha	69.1563
-1TIM	Abstand C_beta	70.1587
-1TIM	X-Groesse	53.6660
-1TIM	Y-Groesse	76.7600
-1TIM	Z-Groesse	48.1300
-1TIM	Volumen	198266.8260
-256b	Anteil AS in Sekundaerstruktur	0.8019
-256b	Abstand C_alpha	24.8643
-256b	Abstand C_beta	24.5055
-256b	X-Groesse	45.3570
-256b	Y-Groesse	57.7580
-256b	Z-Groesse	46.7310
-256b	Volumen	122422.5842
