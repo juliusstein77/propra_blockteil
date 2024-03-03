@@ -15,10 +15,12 @@ def generate_random_sequence(length, gc_content):
     sequence = ''
     # Generate the sequence by adding random GC and AT bases (with the correct ratio)
     for i in range(num_gc):
+        # random.choice selects a random element from the given sequence
         sequence += random.choice('GC')
     for i in range(num_at):
         sequence += random.choice('AT')
     # Shuffle the sequence to make it random
+    # random.sample selects a random sample of the given length from the sequence
     sequence = ''.join(random.sample(sequence, min(length, len(sequence))))  # Shuffle the sequence
     return sequence
 

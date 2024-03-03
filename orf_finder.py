@@ -73,6 +73,7 @@ def main():
     # Iterate over all sequences and find ORFs
     for seq_name, seq in sequences.items():
         # Find ORFs in the sequence and its reverse complement
+        # find_orfs returns a list of ORFs
         orfs = find_orfs(seq)
         orfs_reverse = find_orfs(reverse_complement(seq))
 
@@ -83,6 +84,7 @@ def main():
         for orf in orfs_reverse:
             all_orfs.append(orf)
 
+        # Store the ORFs in the output dictionary
         for i, orf in enumerate(all_orfs):
             output_sequences[f'{seq_name}_{i}'] = orf
 
