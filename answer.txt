@@ -7,7 +7,7 @@ Vergleichen Sie Ihr Datenbank-basiertes Programm mit dem von Aufgabenblatt 1, vo
 Erklaeren Sie die gefundenen Laufzeitunterschiede.
 
 When comparing the runtime of the database-based program with the one from Aufgabenblatt 1 for searching a Prosite pattern, there are several factors to consider.
-These are the results regarding Laufzeit we might expect and why:
+These are the results regarding runtime we might expect and why:
 
 Database-based Program Expected to Have Longer Startup Time:
 Since the database-based program involves establishing a connection to the database and executing SQL queries,
