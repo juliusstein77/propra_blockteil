@@ -8,13 +8,15 @@ class Benchmarker
   end
 
   def benchmark(name)
-    time = Benchmark.realtime {yield}
-    @result << {name: name, time:time}
+    time = Benchmark.realtime { yield }
+    @results << { name: name, time: time }
     time
   end
+
   def cpu_load
     Sys::CPU.load_avg
   end
+
   def print
     @result.each do |result|
       puts "#{result[:name]} took #{result[:time].round(2)} seconds"

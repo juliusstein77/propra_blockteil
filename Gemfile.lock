@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     benchmark (0.2.1)
+    dotenv (3.1.0)
     ffi (1.16.3)
     sys-cpu (1.0.6)
       ffi (~> 1.1)
@@ -12,6 +13,7 @@ PLATFORMS
 
 DEPENDENCIES
   benchmark
+  dotenv
   sys-cpu
 
 RUBY VERSION
