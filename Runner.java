@@ -9,7 +9,7 @@ public class Runner {
     public static void main(String[] args) {
         CmdParserV2 parser = new CmdParserV2();
         parser.addOption("go", false);
-        parser.addOption("ge", false);
+        //parser.addOption("ge", false);
         parser.addOption("match", true);
         parser.addOption("mismatch", true);
         parser.addOption("pairs", true);
