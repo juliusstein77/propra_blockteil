@@ -4,6 +4,7 @@ require_relative 'lib/exception_handler.rb'
 require_relative 'jar_benchmarker.rb'
 require 'yaml'
 
+#TODO: divide performance by sample size
 
 CustomExceptionHandler.handle_custom_exceptions do
   args = ARGV.dup

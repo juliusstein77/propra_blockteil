@@ -8,6 +8,7 @@ class Benchmarker
   end
 
   def benchmark(name, uri = nil, iterations = 1)
+    puts "Benchmarking #{uri}..."
     iterations.times do
       time = Benchmark.realtime { yield }
       cpu = cpu_load

@@ -41,7 +41,8 @@ class JarBenchmarker < Benchmarker
 
       tasks.each do |task|
         benchmark(task[:command], task[:uri], task[:rounds]) do
-          system("#{task[:command]} > #{Gem.win_platform? ? 'NUL' : '/dev/null'} 2>&1")
+          #system("#{task[:command]} > #{Gem.win_platform? ? 'NUL' : '/dev/null'} 2>&1")
+          system(task[:command])
         end
       end
     end
