@@ -1,24 +1,21 @@
+#!/usr/bin/env ruby-3.3.2
 require_relative 'lib/custom_exception.rb'
 require_relative 'lib/exception_handler.rb'
 require_relative 'jar_benchmarker.rb'
-require 'dotenv/load'
+require 'yaml'
 
 
 CustomExceptionHandler.handle_custom_exceptions do
-  if ARGV.first == "jar"
-    jar_files = {}
-    ARGV.drop(1).each_slice(2) do |file, main|
-      jar_files[file] = main
-    end
-
-    if jar_files.empty?
-      raise CustomException::InvalidInput::Jar
-    end
-
-    jar_benchmarker = JarBenchmarker.new(jar_files)
-    jar_benchmarker.benchmark_jars
-    #jar_benchmarker.print
-
+  args = ARGV.dup
+  if args.first == "jar"
+    args.shift(1)
+    config_file = args.first
+    raise CustomException::InvalidInput::Config if config_file.nil?
+    config = YAML.load_file(config_file)
+    raise CustomException::InvalidInput if config.nil?
+    jar_benchmarker = JarBenchmarker.new(config)
+    jar_benchmarker.run
+    jar_benchmarker.to_csv
   else
     raise CustomException::InvalidInput
   end

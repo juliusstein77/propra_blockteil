@@ -6,6 +6,9 @@ GEM
     ffi (1.16.3)
     sys-cpu (1.0.6)
       ffi (~> 1.1)
+    sys-proctable (1.3.0)
+      ffi (~> 1.1)
+    yaml (0.3.0)
 
 PLATFORMS
   x64-mingw-ucrt
@@ -15,6 +18,8 @@ DEPENDENCIES
   benchmark
   dotenv
   sys-cpu
+  sys-proctable
+  yaml
 
 RUBY VERSION
    ruby 3.2.2p53

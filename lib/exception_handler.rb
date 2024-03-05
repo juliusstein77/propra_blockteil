@@ -10,6 +10,9 @@ module CustomExceptionHandler
   rescue CustomException::InvalidInput::Jar => e
     render_error("Usage: ruby #{__FILE__} jar <jar_file> <main_class> [<jar_file> <main_class>]* - #{e.message}")
 
+  rescue CustomException::InvalidInput::Config => e
+    render_error("Usage: ruby #{__FILE__} jar <config_file> - #{e.message}")
+
   rescue CustomException::InvalidInput => e
     render_error("Usage: ruby #{__FILE__} <mode> <case_file> [<case_class>] - #{e.message}")
 
