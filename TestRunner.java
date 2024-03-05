@@ -2,7 +2,7 @@ import java.io.IOException;
 
 public class TestRunner {
     public static void main(String[] args) throws IOException {
-        ScoringMatrix scoringMatrix = new ScoringMatrix("/Users/juliusstein/Desktop/Studium/lmu_tum_bioinfo/ws2324/ProPra_ws2324/blockteil/ueb3/MATRICES/pam250.mat");
+        ScoringMatrix scoringMatrix = new ScoringMatrix("/Users/juliusstein/Desktop/Studium/lmu_tum_bioinfo/ws2324/ProPra_ws2324/blockteil/ueb3/MATRICES/blosum62.mat");
         int score = scoringMatrix.getScore('A', 'A');
         System.out.println("Name of the matrix: " + scoringMatrix.matrixName);
         System.out.println("Score: " + scoringMatrix.Score);

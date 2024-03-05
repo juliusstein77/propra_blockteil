@@ -10,8 +10,8 @@ public class Runner2 {
 
     public static void main(String[] args) {
         CmdParserV2 parser = new CmdParserV2();
-        parser.addOption("go", false);
-        parser.addOption("ge", false);
+        parser.addOption("go", true);
+        parser.addOption("ge", true);
         parser.addOption("m", true);
         parser.addOption("pairs", true);
         parser.addOption("seqlib", true);
@@ -25,6 +25,10 @@ public class Runner2 {
             String pairsFile = parser.getOptionValue("pairs");
             String seqlibFile = parser.getOptionValue("seqlib");
             String mode = parser.getOptionValue("mode");
+
+            //TODO: Parse all necessary command line arguments
+            //TODO: modify the output accordingly
+            //TODO: print help text if no/wrong arguments are provided
 
             // Convert string arguments to appropriate data types
             int go = goStr != null ? Integer.parseInt(goStr) : -12; // Default gap open penalty
@@ -46,7 +50,7 @@ public class Runner2 {
                 String seq2 = sequenceLibrary.get(pair[1]);
                 // Perform alignment using seq1 and seq2, match score (match), gap penalties (go, ge)
                 int score = 0;
-                score = NeedlemanWunschV2.needlemanWunsch(seq1, seq2, scoringMatrix, go, ge);
+                score = NeedlemanWunschV2.needlemanWunsch(seq1, seq2, scoringMatrix, go, ge, mode);
                 // Print alignment results
                 System.out.println("Alignment score for sequences " + pair[0] + " and " + pair[1] + ":");
                 System.out.println(score);

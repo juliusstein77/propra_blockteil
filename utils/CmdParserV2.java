@@ -23,6 +23,8 @@ public class CmdParserV2 {
         switches.put(name, false);
     }
 
+    //TODO: should be able to recognize -m option
+
     // Method to parse command line arguments
     public void parse(String[] args) throws IllegalArgumentException {
         int i = 0;
