@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="blockgruppe3:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/blockgruppe3_jar</output-path>
+    <root id="archive" name="blockgruppe3.jar">
+      <element id="module-output" name="blockgruppe3" />
+      <element id="dir-copy" path="$PROJECT_DIR$/../othello/src" />
+    </root>
+  </artifact>
+</component>

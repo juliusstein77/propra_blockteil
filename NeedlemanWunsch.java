@@ -43,7 +43,7 @@ public class NeedlemanWunsch {
         printMatrix(dp);
         return dp[m][n];
     }
-
+    /*
     public static void main(String[] args) {
         String P = "TATAAT";
         String S = "TTACGTAAGC";
@@ -54,6 +54,7 @@ public class NeedlemanWunsch {
         int score = needlemanWunsch(P, S, matchScore, mismatchPenalty, gapPenalty);
         System.out.println("Optimal alignment score: " + score);
     }
+    */
 }
 
 /*

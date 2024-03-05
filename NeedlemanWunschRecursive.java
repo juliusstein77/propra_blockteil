@@ -1,6 +1,6 @@
 public class NeedlemanWunschRecursive {
 
-    private static int needlemanWunschRecursiveHelper(String P, String S, int i, int j, int matchScore, int mismatchPenalty, int gapPenalty) {
+    public static int needlemanWunschRecursiveHelper(String P, String S, int i, int j, int matchScore, int mismatchPenalty, int gapPenalty) {
         // Base cases
         if (i == 0 && j == 0) {
             return 0;
@@ -20,7 +20,7 @@ public class NeedlemanWunschRecursive {
 
         return Math.max(Math.max(diagonal, left), up);
     }
-
+    /*
     public static void main(String[] args) {
         String P = "TATAAT";
         String S = "TTACGTAAGC";
@@ -31,4 +31,6 @@ public class NeedlemanWunschRecursive {
         int score = needlemanWunschRecursiveHelper(P, S, P.length(), S.length(), matchScore, mismatchPenalty, gapPenalty);
         System.out.println("Optimal alignment score: " + score);
     }
+
+     */
 }
