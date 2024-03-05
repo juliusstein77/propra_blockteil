@@ -95,4 +95,13 @@ public class CalcGOR_I {
         HashMap<Character, Double> frequencies = new HashMap<>();
         return frequencies;
     }
+
+    // TODO:
+    public void toWriteToTxt() {
+        for (Sequence s: sequencesToPredict) {
+            System.out.println(s.getId());
+            System.out.println(s.getAaSequence());
+            System.out.println(s.getSsSequence() + "--------");
+        }
+    }
 }
