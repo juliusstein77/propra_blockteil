@@ -28,11 +28,11 @@ public class GORMain {
         gorI.predict();
         gorI.printPredictions();
         if (format.equals("txt")){
-            gorI.toTxt();
+            gorI.writeToTxt();
         }
         else {
             // TODO: to HTML
-            gorI.toTxt();
+            gorI.writeToTxt();
         }
     }
 }

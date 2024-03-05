@@ -97,7 +97,7 @@ public class CalcGOR_I {
     }
 
     // TODO:
-    public void toWriteToTxt() {
+    public void writeToTxt() {
         for (Sequence s: sequencesToPredict) {
             System.out.println(s.getId());
             System.out.println(s.getAaSequence());
