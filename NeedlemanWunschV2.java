@@ -47,8 +47,10 @@ public class NeedlemanWunschV2 {
                 int diagonal = dp[i - 1][j - 1] + scoringMatrix.getScore(P.charAt(i - 1), S.charAt(j - 1));
                 int left = dp[i][j - 1] + gapExtendPenalty;
                 int up = dp[i - 1][j] + gapExtendPenalty;
+
                 int max = Math.max(Math.max(diagonal, left), up);
                 int maxZero = Math.max(0, max);
+
                 if (mode.equals("local")) {
                     dp[i][j] = maxZero;
                 } else if (mode.equals("freeshift")) {
@@ -63,6 +65,21 @@ public class NeedlemanWunschV2 {
             }
         }
 
+        if (mode == "global") {
+            backtracking(P, S, dp, scoringMatrix, gapExtendPenalty);
+        } else if (mode == "local") {
+            backtrackinglocal(P, S, dp, scoringMatrix, gapExtendPenalty);
+        } else if (mode == "freeshift") {
+            backtrackingfreeshift(P, S, dp, scoringMatrix, gapExtendPenalty);
+        }
+
+
+        // Return the score at the bottom-right corner of the matrix (optimal alignment score)
+        printMatrix(dp);
+        return dp[m][n];
+    }
+
+    public static ArrayList<String> backtracking(String P, String S, int[][] m, ScoringMatrix scoringMatrix, int gapExtendPenalty) {
         //backtracking
         char[] PArray = P.toCharArray();
         char[] SArray = S.toCharArray();
@@ -73,12 +90,12 @@ public class NeedlemanWunschV2 {
         StringBuilder alignedS = new StringBuilder();
 
         while (k > 0 || l > 0) {
-            if (k > 0 && l > 0 && dp[k][l] == dp[k - 1][l - 1] + scoringMatrix.getScore(PArray[k - 1], SArray[l - 1])) {
+            if (k > 0 && l > 0 && m[k][l] == m[k - 1][l - 1] + scoringMatrix.getScore(PArray[k - 1], SArray[l - 1])) {
                 alignedP.append(PArray[k - 1]);
                 alignedS.append(SArray[l - 1]);
                 k--;
                 l--;
-            } else if (k > 0 && dp[k][l] == dp[k - 1][l] + gapExtendPenalty) {
+            } else if (k > 0 && m[k][l] == m[k - 1][l] + gapExtendPenalty) {
                 alignedP.append(PArray[k - 1]);
                 alignedS.append("-");
                 k--;
@@ -91,14 +108,147 @@ public class NeedlemanWunschV2 {
 
         alignment.add(alignedP.reverse().toString());
         alignment.add(alignedS.reverse().toString());
+        return alignment;
+        /*
         for (String s : alignment) {
             System.out.println(s);
         }
-
-        // Return the score at the bottom-right corner of the matrix (optimal alignment score)
-        printMatrix(dp);
-        return dp[m][n];
+         */
     }
+
+    public static void backtrackinglocal(String P, String S, int[][] m, ScoringMatrix scoringMatrix, int gapExtendPenalty) {
+        // Backtracking
+        char[] PArray = P.toCharArray();
+        char[] SArray = S.toCharArray();
+        ArrayList<String> alignment = new ArrayList<>();
+        StringBuilder alignedP = new StringBuilder();
+        StringBuilder alignedS = new StringBuilder();
+
+        // Find the cell with the highest score
+        int maxScore = Integer.MIN_VALUE;
+        int maxI = 0;
+        int maxJ = 0;
+        for (int i = 0; i < m.length; i++) {
+            for (int j = 0; j < m[0].length; j++) {
+                if (m[i][j] > maxScore) {
+                    maxScore = m[i][j];
+                    maxI = i;
+                    maxJ = j;
+                }
+            }
+        }
+
+        // Start backtracking from the cell with the highest score
+        int k = maxI;
+        int l = maxJ;
+
+        while (k > 0 && l > 0 && m[k][l] != 0) {
+            if (m[k][l] == m[k - 1][l - 1] + scoringMatrix.getScore(PArray[k - 1], SArray[l - 1])) {
+                alignedP.append(PArray[k - 1]);
+                alignedS.append(SArray[l - 1]);
+                k--;
+                l--;
+            } else if (m[k][l] == m[k - 1][l] + gapExtendPenalty) {
+                alignedP.append(PArray[k - 1]);
+                alignedS.append("-");
+                k--;
+            } else {
+                alignedP.append("-");
+                alignedS.append(SArray[l - 1]);
+                l--;
+            }
+        }
+
+
+
+        // Reverse the alignment strings
+        String alignedPString = alignedP.reverse().toString();
+        String alignedSString = alignedS.reverse().toString();
+
+        // Add the alignment strings to the list
+        alignment.add(alignedPString);
+        alignment.add(alignedSString);
+
+        // Print the alignment
+        for (String s : alignment) {
+            System.out.println(s);
+        }
+    }
+
+    public static void backtrackingfreeshift(String P, String S, int[][] m, ScoringMatrix scoringMatrix, int gapExtendPenalty) {
+        // Backtracking
+        char[] PArray = P.toCharArray();
+        char[] SArray = S.toCharArray();
+        ArrayList<String> alignment = new ArrayList<>();
+        StringBuilder alignedP = new StringBuilder();
+        StringBuilder alignedS = new StringBuilder();
+
+        // Find the cell with the highest score in the last row
+        int maxScoreLastRow = Integer.MIN_VALUE;
+        int maxJLastRow = 0;
+        for (int j = 0; j < m[0].length; j++) {
+            if (m[m.length - 1][j] > maxScoreLastRow) {
+                maxScoreLastRow = m[m.length - 1][j];
+                maxJLastRow = j;
+            }
+        }
+
+        // Find the cell with the highest score in the last column
+        int maxScoreLastCol = Integer.MIN_VALUE;
+        int maxILastCol = 0;
+        for (int i = 0; i < m.length; i++) {
+            if (m[i][m[0].length - 1] > maxScoreLastCol) {
+                maxScoreLastCol = m[i][m[0].length - 1];
+                maxILastCol = i;
+            }
+        }
+
+        // Start backtracking from the cell with the highest score in the last row or column
+        int k;
+        int l;
+        if (maxScoreLastRow >= maxScoreLastCol) {
+            k = m.length - 1;
+            l = maxJLastRow;
+        } else {
+            k = maxILastCol;
+            l = m[0].length - 1;
+        }
+
+        while (k > 0 && l > 0) {
+            if (m[k][l] == 0) {
+                break;
+            }
+            if (m[k][l] == m[k - 1][l - 1] + scoringMatrix.getScore(PArray[k - 1], SArray[l - 1])) {
+                alignedP.append(PArray[k - 1]);
+                alignedS.append(SArray[l - 1]);
+                k--;
+                l--;
+            } else if (m[k][l] == m[k - 1][l] + gapExtendPenalty) {
+                alignedP.append(PArray[k - 1]);
+                alignedS.append("-");
+                k--;
+            } else {
+                alignedP.append("-");
+                alignedS.append(SArray[l - 1]);
+                l--;
+            }
+        }
+
+        // Reverse the alignment strings
+        String alignedPString = alignedP.reverse().toString();
+        String alignedSString = alignedS.reverse().toString();
+
+        // Add the alignment strings to the list
+        alignment.add(alignedPString);
+        alignment.add(alignedSString);
+
+        // Print the alignment
+        for (String s : alignment) {
+            System.out.println(s);
+        }
+    }
+
+
     /*
     public static void main(String[] args) {
         String P = "TATAAT";
