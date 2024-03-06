@@ -9,6 +9,7 @@ public class Gotoh {
     private static double g(int gap_open_penalty, int gap_extend_penalty, int k) {
         return (k * gap_extend_penalty) + gap_open_penalty;
     }
+
     private static void compute(double[][] d, double[][] i, double[][] a, String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode, Boolean debug) {
         for (int i1 = 1; i1 < a.length; i1++) { //cols
             for (int j = 1; j < a[0].length; j++) { //rows
@@ -25,16 +26,15 @@ public class Gotoh {
     private static void initializeMatrices(String mode, double[][] a, double[][] d, double[][] i, Integer go, Integer ge) {
         switch (mode) {
             case "global":
-                a[0][0] = 0;
+
                 for (int j = 0; j < a[0].length; j++) {
                     a[0][j] = go + j * ge;
                     //a[j][0] = go + j * ge;
-                }
+                }g
                 for (int i1 = 0; i1 < a.length; i1++) {
                     a[i1][0] = go + i1 * ge;
                 }
-
-
+                a[0][0] = 0;
                 // --- i(0,j) = -inf ---
                 for (int col = 0; col < i[0].length; col++) {
                     i[0][col] = Integer.MIN_VALUE;
