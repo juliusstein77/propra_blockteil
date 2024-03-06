@@ -43,6 +43,7 @@ public class ScoringMatrix {
                     double doubleValue = Double.parseDouble(values[col]);
                     int intValue = (int) Math.round(doubleValue); // Multiply by 3 to convert to integer
                     matrix[row][col - 1] = intValue;
+                    matrix[col-1][row] = intValue;
                 }
                 row++;
             }
@@ -52,7 +53,6 @@ public class ScoringMatrix {
         for (int i = 0; i < rowIndex.length(); i++) {
             indexMap.put(rowIndex.charAt(i), i);
         }
-
         reader.close();
     }
 

@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class NeedlemanWunschV2 {
 
@@ -22,12 +23,22 @@ public class NeedlemanWunschV2 {
         // Initialize the dynamic programming matrix
         int[][] dp = new int[m + 1][n + 1];
 
-        // Initialize the first row and first column
-        for (int i = 1; i <= m; i++) {
-            dp[i][0] = i * gapExtendPenalty;
-        }
-        for (int j = 1; j <= n; j++) {
-            dp[0][j] = j * gapExtendPenalty;
+        if (mode.equals("global")) {
+            // Initialize the first row and first column
+            for (int i = 1; i <= m; i++) {
+                dp[i][0] = i * gapExtendPenalty;
+            }
+            for (int j = 1; j <= n; j++) {
+                dp[0][j] = j * gapExtendPenalty;
+            }
+        } else if (mode.equals("local") || mode.equals("freeshift")) {
+            // Initialize the first row and first column
+            for (int i = 1; i <= m; i++) {
+                dp[i][0] = 0;
+            }
+            for (int j = 1; j <= n; j++) {
+                dp[0][j] = 0;
+            }
         }
 
         // Fill in the dynamic programming matrix
@@ -36,8 +47,52 @@ public class NeedlemanWunschV2 {
                 int diagonal = dp[i - 1][j - 1] + scoringMatrix.getScore(P.charAt(i - 1), S.charAt(j - 1));
                 int left = dp[i][j - 1] + gapExtendPenalty;
                 int up = dp[i - 1][j] + gapExtendPenalty;
-                dp[i][j] = Math.max(Math.max(diagonal, left), up);
+                int max = Math.max(Math.max(diagonal, left), up);
+                int maxZero = Math.max(0, max);
+                if (mode.equals("local")) {
+                    dp[i][j] = maxZero;
+                } else if (mode.equals("freeshift")) {
+                    if (i == 1 || j == 1)
+                        dp[i][j] = maxZero;
+                    else
+                        dp[i][j] = max;
+                    dp[i][j] = max;
+                } else if (mode.equals("global")) {
+                    dp[i][j] = max;
+                }
             }
+        }
+
+        //backtracking
+        char[] PArray = P.toCharArray();
+        char[] SArray = S.toCharArray();
+        ArrayList<String> alignment = new ArrayList<>();
+        int k = PArray.length;
+        int l = SArray.length;
+        StringBuilder alignedP = new StringBuilder();
+        StringBuilder alignedS = new StringBuilder();
+
+        while (k > 0 || l > 0) {
+            if (k > 0 && l > 0 && dp[k][l] == dp[k - 1][l - 1] + scoringMatrix.getScore(PArray[k - 1], SArray[l - 1])) {
+                alignedP.append(PArray[k - 1]);
+                alignedS.append(SArray[l - 1]);
+                k--;
+                l--;
+            } else if (k > 0 && dp[k][l] == dp[k - 1][l] + gapExtendPenalty) {
+                alignedP.append(PArray[k - 1]);
+                alignedS.append("-");
+                k--;
+            } else {
+                alignedP.append("-");
+                alignedS.append(SArray[l - 1]);
+                l--;
+            }
+        }
+
+        alignment.add(alignedP.reverse().toString());
+        alignment.add(alignedS.reverse().toString());
+        for (String s : alignment) {
+            System.out.println(s);
         }
 
         // Return the score at the bottom-right corner of the matrix (optimal alignment score)
