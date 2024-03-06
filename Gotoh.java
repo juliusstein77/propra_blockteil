@@ -1,17 +1,31 @@
-import java.util.HashMap;
+import java.io.IOException;
 
 public class Gotoh {
-    private String seq1;
-    private String seq2;
-    private HashMap<String,Double> matrix;
-    private int gap_open;
-    private int gap_extend;
-    public Gotoh(String seq1, String seq2, HashMap<String,Double> matrix, int gap_open, int gap_extend) {
-        this.seq1 = seq1;
-        this.seq2 = seq2;
-        this.matrix = matrix;
-        this.gap_open = gap_open;
-        this.gap_extend = gap_extend;
+    public static int run(String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode) throws IOException {
+        int m = P.length();
+        int n = S.length();
+        int[][] dp = new int[m + 1][n + 1];
+
+
+
+
+        return dp[m][n];
     }
 
+    public static void main(String[] args) {
+        String P = "TATAAT";
+        String S = "TTACGTAAGC";
+        ScoringMatrix scoring_matrix = null;
+        int gap_open_penalty = -11;
+        int gap_extend_penalty = -1;
+        String mode = "global";
+        int score = 0;
+        try {
+            score = run(P, S, scoring_matrix, gap_open_penalty, gap_extend_penalty, mode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Optimal alignment score: " + score);
+    }
 }
