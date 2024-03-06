@@ -1,12 +1,13 @@
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class Trainer {
+public class TrainerGOR_I {
     private final SearchWindow searchWindow;
     private final ArrayList<Sequence> trainingSequences;
-    public Trainer(String pathToDBfile) throws IOException {
-        searchWindow = new SearchWindow();
+    private int gorType;
+    public TrainerGOR_I(String pathToDBfile, int gorType) throws IOException {
+        this.gorType = gorType;
+        searchWindow = new SearchWindow(gorType);
         this.trainingSequences = SecLibFileReader.readSecLibFile(pathToDBfile);
     }
 
@@ -18,9 +19,9 @@ public class Trainer {
             String pdbId = sequence.getId();
             String aaSequence = sequence.getAaSequence();
             String ssSequence = sequence.getSsSequence();
-            searchWindow.slideWindowAndCount(aaSequence, ssSequence, pdbId);
+            searchWindow.trainGORI(aaSequence, ssSequence, pdbId);
         }
-        searchWindow.writeToFile(pathToModelFile);
+        searchWindow.writeToFile(pathToModelFile, this.getGorType());
     }
 
     // getters and setters
@@ -30,5 +31,9 @@ public class Trainer {
 
     public ArrayList<Sequence> getTrainingSequences() {
         return trainingSequences;
+    }
+
+    public int getGorType() {
+        return gorType;
     }
 }

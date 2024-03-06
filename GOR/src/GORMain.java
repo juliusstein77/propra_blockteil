@@ -31,5 +31,12 @@ public class GORMain {
         if (format.equals("txt")){
             System.out.println(gorI);
         }
+
+        // CalcGOR_III gorIII = new CalcGOR_III(pathToModel, fastaPath);
+        // HashMap<Character, Integer> test = gorIII.calcStructureOccurrencies();
+        // gorIII.predict();
+        // if (format.equals("txt")){
+        //     System.out.println(gorIII);
+        // }
     }
 }

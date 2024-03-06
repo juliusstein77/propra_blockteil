@@ -9,19 +9,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SearchWindow {
-    private final HashMap<Character, int[][]> secStructMatrices = new HashMap<>();
+    private final HashMap<Character, int[][]> gor1Matrices = new HashMap<>();
+    private final HashMap<Character, HashMap<Character, int[][]>> gor3Matrices = new HashMap<>();
     private final HashMap<Integer, Character> INDEX_TO_AA = new HashMap<>();
     private final HashMap<Character, Integer> AA_TO_INDEX = new HashMap<>();
     private final char[] secStructTypes = {'H', 'E', 'C'};
 
-    public SearchWindow() {
-        this.initMatrices(this.secStructTypes);
+    public SearchWindow(int gorType) {
         initAAHashMaps();
+        if (gorType == 1) {
+            this.initMatricesGOR1(this.secStructTypes);
+        }
+        else if (gorType == 3) {
+            this.initMatricesGOR3();
+        }
     }
 
-    public SearchWindow(String pathToModelFile) throws IOException {
+    public SearchWindow(int gorType, String pathToModelFile) throws IOException {
         initAAHashMaps();
-        this.initMatrices(this.secStructTypes);
+        if (gorType == 1) {
+            this.initMatricesGOR1(this.secStructTypes);
+        }
+        else if (gorType == 3) {
+           this.initMatricesGOR3();
+        }
         // read model file to init matrices
         this.readModFile(pathToModelFile);
     }
@@ -30,15 +41,14 @@ public class SearchWindow {
         return Constants.WINDOW_SIZE.getValue();
     }
 
-    @Override
-    public String toString(){
+    public String gor1ToString(){
         // std out all matrices :)
         StringBuilder out = new StringBuilder();
         out.append("// Matrix3D\n");
 
-        for (char key : this.secStructMatrices.keySet()){
-            out.append("=").append(key).append("=\n");
-            int[][] currSecMatrix = secStructMatrices.get(key);
+        for (char key : this.gor1Matrices.keySet()){
+            out.append("=").append(key).append("=\n\n");
+            int[][] currSecMatrix = gor1Matrices.get(key);
 
             for (int i = 0; i < Constants.AA_SIZE.getValue(); i++) {
                 out.append(this.INDEX_TO_AA.get(i) + "\t");
@@ -54,22 +64,47 @@ public class SearchWindow {
         return out.toString();
     }
 
-    public void initMatrices(char[] secStructTypes){
+    public String gor3ToString(){
+        StringBuilder out = new StringBuilder();
+        out.append("// Matrix4D\n");
+
+        for (char aa : this.gor3Matrices.keySet()){
+            for (char secType : this.gor3Matrices.get(aa).keySet()) {
+                out.append("=" + aa + "," + secType).append("=\n");
+                int[][] currSecMatrix = gor3Matrices.get(aa).get(secType);
+
+                for (int i = 0; i < Constants.AA_SIZE.getValue(); i++) {
+                    out.append(this.INDEX_TO_AA.get(i) + "\t");
+
+                    for (int j = 0; j < Constants.WINDOW_SIZE.getValue(); j++) {
+                        out.append(currSecMatrix[i][j]).append("\t");
+                    }
+                    out.append("\n");
+
+                }
+                out.append("\n");
+            }
+        }
+        return out.toString();
+
+    }
+
+    public void initMatricesGOR1(char[] secStructTypes){
         // init a matrix for each secStructType
         for (char secStruct : secStructTypes){
-            this.secStructMatrices.put(secStruct, new int[20][17]);
+            this.gor1Matrices.put(secStruct, new int[20][17]);
 
             // put default value into matrices
             for (int i = 0; i < Constants.AA_SIZE.getValue(); i++) {
                 for (int j = 0; j <Constants.WINDOW_SIZE.getValue(); j++) {
-                    this.secStructMatrices.get(secStruct)[i][j] = 0;
+                    this.gor1Matrices.get(secStruct)[i][j] = 0;
                 }
             }
         }
     }
 
-    public HashMap<Character, int[][]> getSecStructMatrices() {
-        return this.secStructMatrices;
+    public HashMap<Character, int[][]> getGor1Matrices() {
+        return this.gor1Matrices;
     }
 
     public void initAAHashMaps(){
@@ -121,12 +156,17 @@ public class SearchWindow {
         return INDEX_TO_AA;
     }
 
-    public void writeToFile(String modelFilePath) throws IOException {
+    public void writeToFile(String modelFilePath, int gorType) throws IOException {
         try (BufferedWriter buf = new BufferedWriter(new FileWriter(modelFilePath))) {
             // Get the string representation of your object
-            String output = this.toString();
+            if (gorType == 1) {
+                String output = this.gor1ToString();
+                buf.write(output);
+            } else if (gorType == 3) {
+                String output = this.gor3ToString();
+                buf.write(output);
+            }
             // Write the output to the file
-            buf.write(output);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -150,42 +190,15 @@ public class SearchWindow {
     }
     public void copyLineIntoArray(int i, ArrayList<String> lines, char secType){
         int relativeMatrixIndex = 0;
-        for (int j = i + 1; j <= i + 20; j++) {
+        for (int j = i + 2; j <= i + 21; j++) {
             String[] line = lines.get(j).split("\t");
             for (int k = 0; k < line.length - 1; k++) {
-                this.secStructMatrices.get(secType)[relativeMatrixIndex][k] = Integer.parseInt(line[k+1]);
+                this.gor1Matrices.get(secType)[relativeMatrixIndex][k] = Integer.parseInt(line[k+1]);
             }
             relativeMatrixIndex++;
         }
     }
 
-    /*
-    Filling the matrices using training file (Easily counting up the scores for each window)
-     */
-    public void slideWindowAndCount(String aaSequence, String ssSequence, String pdbId){
-        if (aaSequence.length() >= this.getWINDOWSIZE()) {
-            int start = 0; // init start index
-            int windowMid = this.getWINDOWSIZE() / 2; // define mid index
-            int windowEndPosition  = aaSequence.length() - windowMid ; // define end index of seq (this is the max val of windowMid)
-
-            // enter main loop
-            while (windowMid < windowEndPosition) {
-                String aaSubSeq = aaSequence.substring(windowMid - this.getWINDOWSIZE() / 2, windowMid + 1 + this.getWINDOWSIZE() / 2);
-                String ssSubSeq = ssSequence.substring(windowMid - this.getWINDOWSIZE() / 2, windowMid + 1 + this.getWINDOWSIZE() / 2);
-
-                // in the subSeqs get the corresponding vals
-                for (int index = 0; index < aaSubSeq.length(); index++) {
-                    char currSS = ssSubSeq.charAt(this.getWINDOWSIZE() / 2) ; // this is the sec struct of the mid AA
-                    char currAA = aaSubSeq.charAt(index);
-                    if (AA_TO_INDEX.containsKey(currAA)){
-                        int indexOfAAinMatrix = this.AA_TO_INDEX.get(currAA);
-                        this.getSecStructMatrices().get(currSS)[indexOfAAinMatrix][index]++;
-                    }
-                }
-                windowMid++;
-            }
-        }
-    }
 
     /*
     Get all params ready and call addSecondaryCounts and extendSecondarySequence
@@ -193,8 +206,8 @@ public class SearchWindow {
     public void predictSeq(HashMap<Character, Integer> totalOcc, Sequence sequence, int gor){
         String aaSequence = sequence.getAaSequence();
         if (aaSequence.length() >= this.getWINDOWSIZE()) {
-            int start = 0; // init start index
             int windowMid = this.getWINDOWSIZE() / 2; // define mid index
+            int start = 0;
             int windowStop  = aaSequence.length() - windowMid ; // define end index of seq (this is the max val of windowMid)
 
             // enter main loop
@@ -203,7 +216,8 @@ public class SearchWindow {
                 char aaAtWindoMid = aaSequence.charAt(windowMid);
 
                 // now cut out a subsequence of size window
-                String windowSequence = cutSubsequence(aaSequence, windowMid);
+                String windowSequence = aaSequence.substring(start, start + getWINDOWSIZE());
+
                 char predSecStruct = 'C'; // default
                 if (AA_TO_INDEX.containsKey(aaAtWindoMid)){
                     if (gor == 1){
@@ -213,6 +227,7 @@ public class SearchWindow {
 
                 sequence.extendSecStruct(predSecStruct);
                 windowMid++;
+                start++;
             }
         }
         // if the sequence is too short, just give it "-"
@@ -233,29 +248,30 @@ public class SearchWindow {
         scoresPerSeq.put('E', 0.0);
         scoresPerSeq.put('C', 0.0);
 
-        for (char secType: this.getSecStructMatrices().keySet())  {
+        for (char secType: this.getGor1Matrices().keySet())  {
             // loop over sequence
             for (int column = 0; column < windowSequence.length(); column++) {
                 char currAAinWindow = windowSequence.charAt(column);
-
                 if (AA_TO_INDEX.containsKey(currAAinWindow)) {
+
                     // get row and look up value in matrix of curr secType
                     int row = AA_TO_INDEX.get(currAAinWindow);
-                    int valueInMatrix = this.getSecStructMatrices().get(secType)[row][column];
+                    int valueInMatrix = this.getGor1Matrices().get(secType)[row][column];
 
                     int totalSec = totalOcc.get(secType); // f a|s
                     int totalNotSec = 0; // get the !s and !a|s freqs
                     int notSec = 0;
 
-                    for (char antiSecStruct : getSecStructMatrices().keySet()){
+                    for (char antiSecStruct : getGor1Matrices().keySet()){
                        if (secType != antiSecStruct){
                             totalNotSec += totalOcc.get(antiSecStruct); // f !s
-                            notSec += this.getSecStructMatrices().get(antiSecStruct)[row][column];// f a|!s
+                            notSec += this.getGor1Matrices().get(antiSecStruct)[row][column];// f a|!s
                        }
                     }
                     // sum values into scoresPerSeq
-                    double scoreToPutIntoSum = Math.log((1.0 * valueInMatrix / notSec * 1.0 * totalNotSec / totalSec));
-                    scoresPerSeq.put(secType, scoresPerSeq.get(secType) + scoreToPutIntoSum);
+                    double scoreToPutIntoSum = Math.log(1.0 * valueInMatrix / notSec * 1.0 * totalNotSec / totalSec);
+                    double currentValue = scoresPerSeq.get(secType);
+                    scoresPerSeq.put(secType, currentValue + scoreToPutIntoSum);
                 }
             }
         }
@@ -269,57 +285,81 @@ public class SearchWindow {
         }
 
     }
-    public String cutSubsequence(String aaSequence, int windowMid) {
-        return aaSequence.substring(windowMid - this.getWINDOWSIZE() / 2, windowMid + 1 + this.getWINDOWSIZE() / 2);
-    }
     /*
-    Loop over all 3 matrices; for each amino acid in search window:
-    Get all values needed for Value calculation (f_sec, f_!sec, f_secType and f_!secType)
-    Then sum up the value for each Amino Acid in a search window, then normalize them to the SecondaryCounts-HashMap
+    Training model for GOR I
      */
-    public void addSecondaryCounts(String aaSubSeq, HashMap<Character,Integer> totalOcc, HashMap<Character, Double> AASecondaryCounts){
-        for (Character secType : this.secStructMatrices.keySet()) {
-            int sec = 0; // f secType|a
-            double normalizedValue = 0;
-            int notSec = 0; // f_!secType|a
-            for (int index = 0; index < aaSubSeq.length(); index++) {
-                // check if we have counts for the curr AA in the window
-                char currAA = aaSubSeq.charAt(index);
-                int totalSec = totalOcc.get(secType); // f_s
-                int totalNotSec = 0; // f_!s
+    public void trainGORI(String aaSequence, String ssSequence, String pdbId){
+        if (aaSequence.length() >= this.getWINDOWSIZE()) {
+            int start = 0; // init start index
+            int windowMid = this.getWINDOWSIZE() / 2; // define mid index
+            int windowEndPosition  = aaSequence.length() - windowMid ; // define end index of seq (this is the max val of windowMid)
 
-                if (this.AA_TO_INDEX.containsKey(currAA)) {
-                    int aaIndex = AA_TO_INDEX.get(currAA);
-                    int[][] secStructMatrix = secStructMatrices.get(secType);
-                    sec = secStructMatrix[aaIndex][index];
+            // enter main loop
+            while (windowMid < windowEndPosition) {
+                String aaSubSeq = aaSequence.substring(windowMid - this.getWINDOWSIZE() / 2, windowMid + 1 + this.getWINDOWSIZE() / 2);
+                String ssSubSeq = ssSequence.substring(windowMid - this.getWINDOWSIZE() / 2, windowMid + 1 + this.getWINDOWSIZE() / 2);
 
-                    for (Character notSecType : secStructMatrices.keySet()) {
-                        if (!notSecType.equals(secType)) {
-                            notSec += secStructMatrices.get(notSecType)[aaIndex][index];
-                            totalNotSec += totalOcc.get(notSecType);
-                        }
+                // in the subSeqs get the corresponding vals
+                for (int index = 0; index < aaSubSeq.length(); index++) {
+                    char currSS = ssSubSeq.charAt(this.getWINDOWSIZE() / 2) ; // this is the sec struct of the mid AA
+                    char currAA = aaSubSeq.charAt(index);
+                    if (AA_TO_INDEX.containsKey(currAA)){
+                        int indexOfAAinMatrix = this.AA_TO_INDEX.get(currAA);
+                        this.getGor1Matrices().get(currSS)[indexOfAAinMatrix][index]++;
                     }
-                    normalizedValue += Math.log(1.0 * sec / notSec) + (Math.log(1.0 * totalNotSec/ totalSec));
                 }
+                windowMid++;
             }
-            AASecondaryCounts.put(secType, normalizedValue);
         }
     }
 
-    /*
-    Extend Secondary-Structure Sequence by the Score of addSecondaryCounts-Method
-     */
-    public void extendSecondarySequence(HashMap<Character, Double> AASecondaryCounts, Sequence sequence){
-        double scoreH = AASecondaryCounts.get('H');
-        double scoreC = AASecondaryCounts.get('C');
-        double scoreE = AASecondaryCounts.get('E');
+    // ---------------------------------------------- GOR III -------------------------------------------------------
+    public void initMatricesGOR3(){
+        for (char aa : AA_TO_INDEX.keySet()) {
+            // TODO: duplicate code for now >:(
+            HashMap<Character, int[][]> secStructHashMapForAA = new HashMap<>();
+            for (char secStruct : secStructTypes){
+                secStructHashMapForAA.put(secStruct, new int[20][17]);
+                this.gor3Matrices.put(aa, secStructHashMapForAA);
+                // put default value into matrices
+                for (int i = 0; i < Constants.AA_SIZE.getValue(); i++) {
+                    for (int j = 0; j <Constants.WINDOW_SIZE.getValue(); j++) {
+                        this.gor3Matrices.get(aa).get(secStruct)[i][j] = 0;
+                    }
+                }
+            }
+        }
+    }
+    public void trainGORIII(String aaSequence, String ssSequence, String pdbId){
+        if (aaSequence.length() >= this.getWINDOWSIZE()) {
+            int start = 0; // init start index
+            int windowMid = this.getWINDOWSIZE() / 2; // define mid index
+            int windowEndPosition  = aaSequence.length() - windowMid ; // define end index of seq (this is the max val of windowMid)
+            // enter main loop
+            while (windowMid < windowEndPosition) {
+                String aaSubSeq = aaSequence.substring(windowMid - this.getWINDOWSIZE() / 2, windowMid + 1 + this.getWINDOWSIZE() / 2);
+                String ssSubSeq = ssSequence.substring(windowMid - this.getWINDOWSIZE() / 2, windowMid + 1 + this.getWINDOWSIZE() / 2);
 
-        if(scoreH >= scoreC && scoreH >= scoreE) {
-            sequence.extendSecStruct('H');
-        } else if (scoreC >= scoreH && scoreC >= scoreE) {
-            sequence.extendSecStruct('C');
-        } else {
-            sequence.extendSecStruct('E');
+                // in the subSeqs get the corresponding vals
+                for (int index = 0; index < aaSubSeq.length(); index++) {
+
+                    // this is the sec struct of the mid AA
+                    char aaMid = aaSubSeq.charAt(this.getWINDOWSIZE() / 2);
+                    char currSS = ssSubSeq.charAt(this.getWINDOWSIZE() / 2);
+
+                    if (AA_TO_INDEX.containsKey(aaMid)){
+                        for (int i = 0; i < aaSubSeq.length(); i++) {
+                            // for currSS of midAA
+                            char aaToCountInMatrix = aaSubSeq.charAt(i);
+                            if (AA_TO_INDEX.containsKey(aaToCountInMatrix)) {
+                                int indexOfAAinMatrix = this.AA_TO_INDEX.get(aaToCountInMatrix);
+                                this.gor3Matrices.get(aaMid).get(currSS)[indexOfAAinMatrix][index]++;
+                                }
+                            }
+                        }
+                    }
+                windowMid++;
+            }
         }
     }
 }
