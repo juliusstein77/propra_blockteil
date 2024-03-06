@@ -13,9 +13,6 @@ public class NeedlemanWunschV2 {
         }
     }
 
-    //TODO: local alignment, freeshift alignment, global alignment
-    //TODO: Backtracking to find the optimal alignment(s)
-
     public static int needlemanWunsch(String P, String S, ScoringMatrix scoringMatrix, int gapOpenPenalty, int gapExtendPenalty, String mode) throws IOException {
         int m = P.length();
         int n = S.length();
@@ -65,12 +62,17 @@ public class NeedlemanWunschV2 {
             }
         }
 
-        if (mode == "global") {
-            backtracking(P, S, dp, scoringMatrix, gapExtendPenalty);
-        } else if (mode == "local") {
-            backtrackinglocal(P, S, dp, scoringMatrix, gapExtendPenalty);
-        } else if (mode == "freeshift") {
-            backtrackingfreeshift(P, S, dp, scoringMatrix, gapExtendPenalty);
+        ArrayList<String> alignment = new ArrayList<>();
+        if (mode.equals("global")) {
+            alignment = backtracking(P, S, dp, scoringMatrix, gapExtendPenalty);
+        } else if (mode.equals("local")) {
+            alignment = backtrackinglocal(P, S, dp, scoringMatrix, gapExtendPenalty);
+        } else if (mode.equals("freeshift")) {
+            alignment = backtrackingfreeshift(P, S, dp, scoringMatrix, gapExtendPenalty);
+        }
+
+        for (String s : alignment) {
+            System.out.println(s);
         }
 
 
@@ -116,7 +118,7 @@ public class NeedlemanWunschV2 {
          */
     }
 
-    public static void backtrackinglocal(String P, String S, int[][] m, ScoringMatrix scoringMatrix, int gapExtendPenalty) {
+    public static ArrayList<String> backtrackinglocal(String P, String S, int[][] m, ScoringMatrix scoringMatrix, int gapExtendPenalty) {
         // Backtracking
         char[] PArray = P.toCharArray();
         char[] SArray = S.toCharArray();
@@ -168,14 +170,16 @@ public class NeedlemanWunschV2 {
         // Add the alignment strings to the list
         alignment.add(alignedPString);
         alignment.add(alignedSString);
-
+        return alignment;
+        /*
         // Print the alignment
         for (String s : alignment) {
             System.out.println(s);
         }
+         */
     }
 
-    public static void backtrackingfreeshift(String P, String S, int[][] m, ScoringMatrix scoringMatrix, int gapExtendPenalty) {
+    public static ArrayList<String> backtrackingfreeshift(String P, String S, int[][] m, ScoringMatrix scoringMatrix, int gapExtendPenalty) {
         // Backtracking
         char[] PArray = P.toCharArray();
         char[] SArray = S.toCharArray();
@@ -241,38 +245,13 @@ public class NeedlemanWunschV2 {
         // Add the alignment strings to the list
         alignment.add(alignedPString);
         alignment.add(alignedSString);
-
+        return alignment;
+        /*
         // Print the alignment
         for (String s : alignment) {
             System.out.println(s);
         }
+         */
     }
 
-
-    /*
-    public static void main(String[] args) {
-        String P = "TATAAT";
-        String S = "TTACGTAAGC";
-        int matchScore = 3;
-        int mismatchPenalty = -2;
-        int gapPenalty = -4;
-
-        int score = needlemanWunsch(P, S, matchScore, mismatchPenalty, gapPenalty);
-        System.out.println("Optimal alignment score: " + score);
-    }
-    */
 }
-
-/*
-Advantages of Dynamic Programming over Simple Recursive Implementation:
-
-Efficiency: Dynamic programming stores and reuses previously computed results, which avoids redundant computations.
-This leads to significant improvements in runtime performance compared to simple recursive implementations, especially for large input sizes.
-
-Memoization: Dynamic programming implicitly uses memoization to store computed values in a table, eliminating the need to recompute them.
-This reduces the overall amount of computation required.
-
-Space Complexity: While dynamic programming uses additional memory to store the dynamic programming table,
-the amount of memory used is proportional to the size of the input (i.e., the lengths of the input strings), making it memory-efficient for practical input sizes.
-In contrast, simple recursive implementations may consume more memory due to the recursive call stack, potentially leading to stack overflow errors for large input sizes.
- */
