@@ -1,7 +1,7 @@
 package utils;
 
 public class Helpers {
-    public static void printMatrix(int[][] matrix, String name) {
+    public static void printMatrix(double[][] matrix, String name) {
         System.out.println(name + "\n" + "_____");
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[0].length; j++) {
@@ -9,6 +9,6 @@ public class Helpers {
             }
             System.out.println();
         }
-        System.out.println("\n\n");
+        System.out.println("\n");
     }
 }

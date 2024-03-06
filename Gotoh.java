@@ -3,7 +3,26 @@ import utils.Helpers;
 import java.io.IOException;
 
 public class Gotoh {
-    private static void initializeMatrices (String mode, int[][] a, int[][] d, int[][] i, Integer go, Integer ge){
+    private static double affine_gap_penalty(int gap_open_penalty, int gap_extend_penalty, int k) {
+        return (k * gap_extend_penalty) + gap_open_penalty;
+    }
+    private static double g(int gap_open_penalty, int gap_extend_penalty, int k) {
+        return (k * gap_extend_penalty) + gap_open_penalty;
+    }
+    private static void compute(double[][] d, double[][] i, double[][] a, String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode, Boolean debug) {
+        for (int i1 = 1; i1 < a.length; i1++) { //cols
+            for (int j = 1; j < a[0].length; j++) { //rows
+                char p = P.charAt(i1 - 1);
+                char s = S.charAt(j - 1);
+                i[i1][j] = Math.max(a[i1 - 1][j] + gap_open_penalty + gap_extend_penalty, i[i1 - 1][j] + gap_extend_penalty);
+                d[i1][j] = Math.max(a[i1][j - 1] + gap_open_penalty + gap_extend_penalty, d[i1][j - 1] + gap_extend_penalty);
+                a[i1][j] = Math.max(a[i1 - 1][j - 1] + scoring_matrix.getScore(p, s), Math.max(d[i1][j], i[i1][j]));
+            }
+        }
+    }
+
+
+    private static void initializeMatrices(String mode, double[][] a, double[][] d, double[][] i, Integer go, Integer ge) {
         switch (mode) {
             case "global":
                 a[0][0] = 0;
@@ -32,33 +51,43 @@ public class Gotoh {
                 break;
         }
     }
-    public static int run(String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode) throws IOException {
+
+    public static double run(String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode, Boolean debug) throws IOException {
         int m = P.length();
         int n = S.length();
-        int[][] mx_d = new int[m + 1][n + 1];
-        int[][] mx_i = new int[m + 1][n + 1];
-        int[][] mx_a = new int[m + 1][n + 1];
-        initializeMatrices(mode, mx_a, mx_d, mx_i, gap_open_penalty, gap_extend_penalty);
-        Helpers.printMatrix(mx_d, "D");
-        Helpers.printMatrix(mx_i, "I");
-        Helpers.printMatrix(mx_a, "A");
+        double[][] mx_d = new double[m + 1][n + 1];
+        double[][] mx_i = new double[m + 1][n + 1];
+        double[][] mx_a = new double[m + 1][n + 1];
 
-        return 0;
+        initializeMatrices(mode, mx_a, mx_d, mx_i, gap_open_penalty, gap_extend_penalty);
+        if (debug) {
+            System.out.println("---||--- Initializing matrices ---||---\n\n");
+            Helpers.printMatrix(mx_d, "D");
+            Helpers.printMatrix(mx_i, "I");
+            Helpers.printMatrix(mx_a, "A");
+        }
+        compute(mx_d, mx_i, mx_a, P, S, scoring_matrix, gap_open_penalty, gap_extend_penalty, mode, debug);
+        if (debug) {
+            System.out.println("---||--- Computing GOTOH WITHOUT BACKTRACING ---||---\n\n");
+            Helpers.printMatrix(mx_a, "A");
+        }
+
+        return mx_a[m][n];
     }
 
     public static void main(String[] args) {
-        String P = "GCATGCCAT";
-        String S = "CATGCATCGAC";
-        ScoringMatrix scoring_matrix = null;
-        int gap_open_penalty = -2;
-        int gap_extend_penalty = -1;
-        String mode = "global";
-        int score = 0;
         try {
-            score = run(P, S, scoring_matrix, gap_open_penalty, gap_extend_penalty, mode);
+            String P = "WTHGQA";
+            String S = "WTHA";
+            ScoringMatrix scoringMatrix = new ScoringMatrix("C:\\Users\\smith\\Downloads\\blosum62.mat");
+            int go = -2;
+            int ge = -1;
+            String mode = "global";
+            double gotohScore = Gotoh.run(P, S, scoringMatrix, go, ge, mode, true);
+            System.out.println("Optimal alignment score: " + gotohScore);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Optimal alignment score: " + score);
+
     }
 }
