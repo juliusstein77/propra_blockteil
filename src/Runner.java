@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import utils.CmdParser;
+import utils.Helpers;
 import utils.PairsReader;
 import utils.SeqLibReader;
 
@@ -12,7 +13,7 @@ public class Runner {
 
     public static void main(String[] args) {
         CmdParser parser = new CmdParser();
-        //parser.addOption("go", true);
+        parser.addOption("go", false);
         parser.addOption("ge", true);
         parser.addOption("m", true);
         parser.addOption("pairs", true);
@@ -25,7 +26,7 @@ public class Runner {
 
         try {
             parser.parse(args);
-            //String goStr = parser.getOptionValue("go");
+            String goStr = parser.getOptionValue("go");
             String geStr = parser.getOptionValue("ge");
             String mFile = parser.getOptionValue("m");
             String pairsFile = parser.getOptionValue("pairs");
@@ -43,7 +44,7 @@ public class Runner {
             //already implemented: --pairs, --seqlib, -m, --go, --ge, --mode, --nw, --format,
 
             // Convert string arguments to appropriate data types
-            //int go = goStr != null ? Integer.parseInt(goStr) : -12; // Default gap open penalty
+            int go = goStr != null ? Integer.parseInt(goStr) : -12; // Default gap open penalty
             int ge = geStr != null ? Integer.parseInt(geStr) : -1; // Default gap extend penalty
 
             // Read scoring matrix file and handle it
@@ -67,20 +68,45 @@ public class Runner {
                     BigDecimal bd = new BigDecimal(score);
                     bd = bd.setScale(4, RoundingMode.HALF_UP);
                     score = bd.doubleValue();
-                } else {
-                    //TODO: add gotoh
-                }
-                // Print alignment results
-                if (format.equals("scores")) {
-                    System.out.println(pair[0] + " " + pair[1] + " " + String.format("%.4f", score).replace(",", "."));
-                } else if (format.equals("ali")) {
-                    System.out.println(">" + pair[0] + " " + pair[1] + " " + String.format("%.3f", score).replace(",", "."));
-                    for (int i = 0; i < NeedlemanWunsch.getAlignment().size(); i++) {
-                        System.out.println(pair[i] + ": " + NeedlemanWunsch.getAlignment().get(i));
+
+                    // Print alignment results
+                    if (format.equals("scores")) {
+                        System.out.println(pair[0] + " " + pair[1] + " " + String.format("%.4f", score).replace(",", "."));
+                    } else if (format.equals("ali")) {
+                        System.out.println(">" + pair[0] + " " + pair[1] + " " + String.format("%.3f", score).replace(",", "."));
+                        for (int i = 0; i < NeedlemanWunsch.getAlignment().size(); i++) {
+                            System.out.println(pair[i] + ": " + NeedlemanWunsch.getAlignment().get(i));
+                        }
+                    } else if (format.equals("html")) {
+
                     }
-                } else if (format.equals("html")) {
+                } else {
+                    HashMap<String, Double> matrix = Helpers.read_in_matrix(mFile);
+                    String output = "";
+                    Gotoh alignment = new Gotoh(seq1, seq2, matrix, go, ge);
+                    if (mode == "global"){
+                        alignment = new GlobalGotoh(seq1, seq2, matrix, go, ge);
+                    } else if (mode == "local") {
+                        alignment = new LocalGotoh(seq1, seq2, matrix, go, ge);
+                    } else if (mode == "freeshift") {
+                        alignment = new FreeshiftGotoh(seq1, seq2, matrix, go, ge);
+                    }
+
+                    // Print alignment results
+                    if (format.equals("scores")) {
+                        output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                    } else if (format.equals("ali")) {
+                        String[] stringsAligned = alignment.alignment.split("\n");
+                        output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                        output += pair[0] + ": " + stringsAligned[0] + "\n";
+                        output += pair[1] + ": " + stringsAligned[1] + "\n";
+                    } else if (format.equals("html")) {
+
+                    }
+                    System.out.println(output);
 
                 }
+
             }
         } catch (IOException e) {
             System.out.println("Error reading input files: " + e.getMessage());
