@@ -25,7 +25,10 @@ public class CmdParser {
             "    --format <scores|ali|html> output format\n" +
             "           scores:     scores only\n" +
             "           ali:        scores + alignment in plaintext\n" +
-            "           html:       scores + alignment in html";
+            "           html:       scores + alignment in html\n" +
+            "    --dpmatrices <directory>   output dynamic programming matrices\n" +
+            "    --check                    calculate checkscores for all alignments\n" +
+            "                               and output only incorrect alignments";
 
 
     public CmdParser() {
