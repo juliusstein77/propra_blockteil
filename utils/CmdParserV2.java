@@ -24,21 +24,33 @@ public class CmdParserV2 {
     }
 
     //TODO: should be able to recognize -m option
+    //TODO: distinguish between required and optional options
 
     // Method to parse command line arguments
     public void parse(String[] args) throws IllegalArgumentException {
         int i = 0;
         while (i < args.length) {
             String arg = args[i];
-            if (arg.startsWith("--")) { // Updated to handle -- syntax
+            if (arg.startsWith("--")) { // Handle -- syntax
                 String name = arg.substring(2); // Remove --
                 if (optionRequired.containsKey(name)) { // Check if the option is required
-                    /*
-                    if (i == args.length - 1 || args[i+2].startsWith("-")) {
+                    if ((i == args.length - 1) || (args[i+1].startsWith("--") && optionRequired.containsKey(args[i+1].substring(2))) || (args[i+1].startsWith("-") && optionRequired.containsKey(args[i+1].substring(1))) ) {
                         throw new IllegalArgumentException("Missing value for option: " + name);
                     }
-                    */
-
+                    options.put(name, args[i+1]);
+                    i += 2;
+                } else if (switches.containsKey(name)) {
+                    switches.put(name, true);
+                    i++;
+                } else {
+                    throw new IllegalArgumentException("Unknown option: " + name);
+                }
+            } else if (arg.startsWith("-")) { // Handle - syntax
+                String name = arg.substring(1); // Remove -
+                if (optionRequired.containsKey(name)) { // Check if the option is required
+                    if (i == args.length - 1 || args[i+1].startsWith("-")) {
+                        throw new IllegalArgumentException("Missing value for option: " + name);
+                    }
                     options.put(name, args[i+1]);
                     i += 2;
                 } else if (switches.containsKey(name)) {
@@ -59,6 +71,9 @@ public class CmdParserV2 {
             }
         }
     }
+
+
+
 
     // Method to get value of an option
     public String getOptionValue(String name) {
