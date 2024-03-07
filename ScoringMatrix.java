@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class ScoringMatrix {
-    private int[][] matrix;
+    private double[][] matrix;
     public String matrixName;
     public String Score;
     public int numRow;
@@ -36,14 +36,13 @@ public class ScoringMatrix {
                 rowIndex = line.split("\\s+")[1];
             } else if (line.startsWith("COLINDEX")) {
                 colIndex = line.split("\\s+")[1];
-                matrix = new int[rowIndex.length()][colIndex.length()];
+                matrix = new double[rowIndex.length()][colIndex.length()];
             } else if (line.startsWith("MATRIX")) {
                 String[] values = line.trim().split("\\s+");
                 for (int col = 1; col < values.length; col++) { // Exclude the first column (ROWINDEX)
                     double doubleValue = Double.parseDouble(values[col]);
-                    int intValue = (int) Math.round(doubleValue); // Multiply by 3 to convert to integer
-                    matrix[row][col - 1] = intValue;
-                    matrix[col-1][row] = intValue;
+                    matrix[row][col - 1] = doubleValue;
+                    matrix[col-1][row] = doubleValue;
                 }
                 row++;
             }
@@ -56,7 +55,7 @@ public class ScoringMatrix {
         reader.close();
     }
 
-    public int getScore(char a, char b) {
+    public double getScore(char a, char b) {
         int indexA = getIndex(a);
         int indexB = getIndex(b);
         return matrix[indexA][indexB];
