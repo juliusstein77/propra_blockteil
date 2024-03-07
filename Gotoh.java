@@ -1,6 +1,6 @@
 import utils.Helpers;
-
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Gotoh {
     private static String backtrack(double[][] d, double[][] i, double[][] a, String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode){
@@ -13,7 +13,6 @@ public class Gotoh {
             while (r > 0 && c > 0) {
                 // --- diagonal --- >>> match/mismatch
                 if (a[r][c] == a[r - 1][c - 1] + scoring_matrix.getScore(P.charAt(r - 1), S.charAt(c - 1))) {
-                    //System.out.println(P.charAt(r - 1) + " " + S.charAt(c - 1));
                     alignmentP = P.charAt(r - 1) + alignmentP;
                     alignmentS = S.charAt(c - 1) + alignmentS;
                     r--;
@@ -21,14 +20,12 @@ public class Gotoh {
                 }
                 // --- up --- >>> gap in P
                 else if (a[r][c] == d[r][c]) {
-                    //System.out.println(S.charAt(c - 1) + " -"); // S, gap in P
                     alignmentP = "-" + alignmentP;
                     alignmentS = S.charAt(c - 1) + alignmentS;
                     c--;
                 }
                 // --- left --- >>> gap in S
                 else if (a[r][c] == i[r][c]) {
-                    //System.out.println("- " + P.charAt(r - 1)); // gap in S, P
                     alignmentP = P.charAt(r - 1) + alignmentP;
                     alignmentS = "-" + alignmentS;
                     r--;
@@ -81,7 +78,7 @@ public class Gotoh {
         }
     }
 
-    public static double run(String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode, Boolean debug) throws IOException {
+    public static HashMap<Double, String> run(String P, String S, ScoringMatrix scoring_matrix, int gap_open_penalty, int gap_extend_penalty, String mode, Boolean debug) throws IOException {
         int m = P.length();
         int n = S.length();
         double[][] mx_d = new double[m + 1][n + 1];
@@ -90,33 +87,46 @@ public class Gotoh {
 
         initializeMatrices(mode, mx_a, mx_d, mx_i, gap_open_penalty, gap_extend_penalty);
         if (debug) {
-            System.out.println("---||--- Initializing matrices ---||---\n\n");
+            System.out.println("---||--- Initializing matrices ---||---\n");
             Helpers.printMatrix(mx_d, "D");
             Helpers.printMatrix(mx_i, "I");
             Helpers.printMatrix(mx_a, "A");
         }
         compute(mx_d, mx_i, mx_a, P, S, scoring_matrix, gap_open_penalty, gap_extend_penalty, mode);
         if (debug) {
-            System.out.println("---||--- Computing GOTOH WITHOUT BACKTRACING ---||---\n\n");
+            System.out.println("---||--- Computing GOTOH WITHOUT BACKTRACING ---||---\n");
             Helpers.printMatrix(mx_d, "D");
             Helpers.printMatrix(mx_i, "I");
             Helpers.printMatrix(mx_a, "A");
         }
         String alignment = backtrack(mx_d, mx_i, mx_a, P, S, scoring_matrix, gap_open_penalty, gap_extend_penalty, mode);
-        System.out.println(alignment);
-        return mx_a[m][n];
+        if (debug) {
+            System.out.println("---||--- BACKTRACING ---||---\n");
+            System.out.println(alignment);
+            System.out.println("Alignment score: " + mx_a[m][n]);
+        }
+
+        HashMap<Double, String> result = new HashMap<>();
+        result.put(mx_a[m][n], alignment);
+        return result;
     }
 
     public static void main(String[] args) {
+
         try {
-            String P = "WTHA";
-            String S = "WTHGQA";
+            String P = "WTHGQACVELSIW";
+            String S = "WTHAVSLW";
             ScoringMatrix scoringMatrix = new ScoringMatrix("C:\\Users\\smith\\Downloads\\blosum62.mat");
             int go = -10;
             int ge = -2;
             String mode = "global";
-            double gotohScore = Gotoh.run(P, S, scoringMatrix, go, ge, mode, true);
-            System.out.println("Optimal alignment score: " + gotohScore);
+            HashMap<Double, String> res = Gotoh.run(P, S, scoringMatrix, go, ge, mode, true);
+            int score = 0;
+            score = res.keySet().iterator().next().intValue();
+            String alignment = res.values().iterator().next();
+            // Print alignment results
+            //System.out.println("Alignment score for sequences " + pair[0] + " and " + pair[1] + ":");
+            System.out.println(score);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -6,7 +6,7 @@ import utils.CmdParserV2;
 import utils.PairsReader;
 import utils.SeqLibReader;
 
-public class Runner2 {
+public class GotohRunner {
 
     public static void main(String[] args) {
         CmdParserV2 parser = new CmdParserV2();
@@ -16,7 +16,6 @@ public class Runner2 {
         parser.addOption("pairs", true);
         parser.addOption("seqlib", true);
         parser.addOption("mode", true);
-        parser.addSwitch("nw");
 
         try {
             parser.parse(args);
@@ -26,7 +25,6 @@ public class Runner2 {
             String pairsFile = parser.getOptionValue("pairs");
             String seqlibFile = parser.getOptionValue("seqlib");
             String mode = parser.getOptionValue("mode");
-            boolean nw = parser.getSwitchValue("nw");
 
             //TODO: Parse all necessary command line arguments
             //TODO: modify the output accordingly
@@ -45,7 +43,7 @@ public class Runner2 {
 
             // Read pairs file
             PairsReader pairsReader = new PairsReader(pairsFile);
-
+            String output = "";
 
             // For each pair of sequences, perform alignment and print results
             for (String[] pair : pairsReader.readPairs(pairsFile)) {
@@ -53,12 +51,19 @@ public class Runner2 {
                 String seq2 = sequenceLibrary.get(pair[1]);
                 // Perform alignment using seq1 and seq2, match score (match), gap penalties (go, ge)
                 int score = 0;
-                score = NeedlemanWunschV2.needlemanWunsch(seq1, seq2, scoringMatrix, go, ge, mode);
+                HashMap<Double, String> res = Gotoh.run(seq1, seq2, scoringMatrix, go, ge, mode, false);
+                score = res.keySet().iterator().next().intValue();
+                String alignment = res.values().iterator().next();
+                String[] stringsAligned = alignment.split("\n");
+                output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", score)).replace(",", ".") + "\n";
+                output += pair[0] + ": " + stringsAligned[0] + "\n";
+                output += pair[1] + ": " + stringsAligned[1] + "\n";
                 // Print alignment results
+                System.out.println(output);
 
 
-                System.out.println("Alignment score for sequences " + pair[0] + " and " + pair[1] + ":");
-                System.out.println(score);
+
+
             }
         } catch (IOException e) {
             System.out.println("Error reading input files: " + e.getMessage());
