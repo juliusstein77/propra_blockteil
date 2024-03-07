@@ -14,7 +14,7 @@ public class Runner {
     public static void main(String[] args) {
         CmdParser parser = new CmdParser();
         parser.addOption("go", false);
-        parser.addOption("ge", true);
+        parser.addOption("ge", false);
         parser.addOption("m", true);
         parser.addOption("pairs", true);
         parser.addOption("seqlib", true);
