@@ -83,10 +83,11 @@ public class Runner {
                 } else {
                     HashMap<String, Double> matrix = Helpers.read_in_matrix(mFile);
                     String output = "";
+                    Gotoh alignment = new Gotoh(seq1, seq2, matrix, go, ge);
 
 
                     if (mode.equals("global")){
-                        GlobalGotoh alignment = new GlobalGotoh(seq1, seq2, matrix, go, ge);
+                        alignment = new GlobalGotoh(seq1, seq2, matrix, go, ge);
                         if (format.equals("scores")) {
                             output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
                         } else if (format.equals("ali")) {
@@ -98,7 +99,7 @@ public class Runner {
 
                         }
                     } else if (mode.equals("local")) {
-                        LocalGotoh alignment = new LocalGotoh(seq1, seq2, matrix, go, ge);
+                        alignment = new LocalGotoh(seq1, seq2, matrix, go, ge);
                         if (format.equals("scores")) {
                             output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
                         } else if (format.equals("ali")) {
@@ -110,7 +111,7 @@ public class Runner {
 
                         }
                     } else if (mode.equals("freeshift")) {
-                        FreeshiftGotoh alignment = new FreeshiftGotoh(seq1, seq2, matrix, go, ge);
+                        alignment = new FreeshiftGotoh(seq1, seq2, matrix, go, ge);
                         if (format.equals("scores")) {
                             output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
                         } else if (format.equals("ali")) {
