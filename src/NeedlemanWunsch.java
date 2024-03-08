@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -9,22 +10,18 @@ public class NeedlemanWunsch {
         return alignment;
     }
 
-    public static void printMatrix(double[][] matrix) {
-        System.out.println("Dynamic Programming Matrix:");
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[0].length; j++) {
-                System.out.print(matrix[i][j] + "\t");
-            }
-            System.out.println();
-        }
+    static double[][] dp;
+
+    public static double[][] getDP() {
+        return dp;
     }
 
-    public static double needlemanWunsch(String P, String S, ScoringMatrix scoringMatrix, int gapExtendPenalty, String mode) throws IOException {
+    public static void initializeMatrix(String P, String S, ScoringMatrix scoringMatrix, int gapExtendPenalty, String mode) {
         int m = P.length();
         int n = S.length();
 
         // Initialize the dynamic programming matrix
-        double[][] dp = new double[m + 1][n + 1];
+        dp = new double[m + 1][n + 1];
 
         if (mode.equals("global")) {
             // Initialize the first row and first column
@@ -67,14 +64,15 @@ public class NeedlemanWunsch {
                 }
             }
         }
+    }
 
+    public static double calculateScore(String P, String S, double[][] dp, String mode) {
+        int m = P.length();
+        int n = S.length();
         double score = 0;
-        //ArrayList<String> alignment = new ArrayList<>();
         if (mode.equals("global")) {
-            alignment = backtracking(P, S, dp, scoringMatrix, gapExtendPenalty);
             score = dp[m][n];
         } else if (mode.equals("local")) {
-            alignment = backtrackinglocal(P, S, dp, scoringMatrix, gapExtendPenalty);
             double maxScore = Integer.MIN_VALUE;
             double maxI = 0;
             double maxJ = 0;
@@ -87,42 +85,41 @@ public class NeedlemanWunsch {
             }
             score = maxScore;
         } else if (mode.equals("freeshift")) {
-            alignment = backtrackingfreeshift(P, S, dp, scoringMatrix, gapExtendPenalty);
             // Find the cell with the highest score in the last row
             double maxScoreLastRow = Integer.MIN_VALUE;
-            int maxJLastRow = 0;
             for (int j = 0; j < dp[0].length; j++) {
                 if (dp[dp.length - 1][j] > maxScoreLastRow) {
                     maxScoreLastRow = dp[dp.length - 1][j];
-                    maxJLastRow = j;
                 }
             }
-
             // Find the cell with the highest score in the last column
             double maxScoreLastCol = Integer.MIN_VALUE;
-            int maxILastCol = 0;
             for (int i = 0; i < dp.length; i++) {
                 if (dp[i][dp[0].length - 1] > maxScoreLastCol) {
                     maxScoreLastCol = dp[i][dp[0].length - 1];
-                    maxILastCol = i;
                 }
             }
-
-            // Start backtracking from the cell with the highest score in the last row or column
-            int k;
-            int l;
-            if (maxScoreLastRow >= maxScoreLastCol) {
-                k = dp.length - 1;
-                l = maxJLastRow;
-            } else {
-                k = maxILastCol;
-                l = dp[0].length - 1;
-            }
-            score = dp[k][l];
+            score = Math.max(maxScoreLastRow, maxScoreLastCol);
         }
+        return score;
+    }
 
-        // Return the score at the bottom-right corner of the matrix (optimal alignment score)
-        //printMatrix(dp);
+    public static double needlemanWunsch(String P, String S, ScoringMatrix scoringMatrix, int gapExtendPenalty, String mode) throws IOException {
+        int m = P.length();
+        int n = S.length();
+        initializeMatrix(P, S, scoringMatrix, gapExtendPenalty, mode);
+
+        double score = 0;
+        if (mode.equals("global")) {
+            alignment = backtracking(P, S, dp, scoringMatrix, gapExtendPenalty);
+            score = calculateScore(P, S, dp, mode);
+        } else if (mode.equals("local")) {
+            alignment = backtrackinglocal(P, S, dp, scoringMatrix, gapExtendPenalty);
+            score = calculateScore(P, S, dp, mode);
+        } else if (mode.equals("freeshift")) {
+            alignment = backtrackingfreeshift(P, S, dp, scoringMatrix, gapExtendPenalty);
+            score = calculateScore(P, S, dp, mode);
+        }
         return score;
     }
 
