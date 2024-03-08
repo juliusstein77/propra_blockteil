@@ -100,34 +100,46 @@ public class Runner {
                 } else {
                     HashMap<String, Double> matrix = Helpers.read_in_matrix(mFile);
                     String output = "";
+                    Gotoh alignment = new Gotoh(seq1, seq2, matrix, go, ge);
 
-                    GlobalGotoh alignment;
-                    LocalGotoh alignment;
-                    FreeshiftGotoh alignment;
 
 
                     if (mode.equals("global")){
-                        GlobalGotoh alignment = new GlobalGotoh(seq1, seq2, matrix, go, ge);
-                    } else if (mode.equals("local")) {
-                        LocalGotoh alignment = new LocalGotoh(seq1, seq2, matrix, go, ge);
-                    } else if (mode.equals("freeshift")) {
-                        FreeshiftGotoh alignment = new FreeshiftGotoh(seq1, seq2, matrix, go, ge);
-                    }
+                        alignment = new GlobalGotoh(seq1, seq2, matrix, go, ge);
+                        if (format.equals("scores")) {
+                            output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                        } else if (format.equals("ali")) {
+                            String[] stringsAligned = alignment.alignment.split("\n");
+                            output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                            output += pair[0] + ": " + stringsAligned[0] + "\n";
+                            output += pair[1] + ": " + stringsAligned[1] + "\n";
+                        } else if (format.equals("html")) {
 
-                    if (dpMatricesPath != null) {
-                        printMatrixToFile(alignment.mx_a, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_a.txt");
-                        printMatrixToFile(alignment.mx_d, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_d.txt");
-                        printMatrixToFile(alignment.mx_i, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_i.txt");
-                    }
-                    if (format.equals("scores")) {
-                        output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                    } else if (format.equals("ali")) {
-                        String[] stringsAligned = alignment.alignment.split("\n");
-                        output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                        output += pair[0] + ": " + stringsAligned[0] + "\n";
-                        output += pair[1] + ": " + stringsAligned[1] + "\n";
-                    } else if (format.equals("html")) {
-                        //TODO: Implement HTML output
+                        }
+                    } else if (mode.equals("local")) {
+                        alignment = new LocalGotoh(seq1, seq2, matrix, go, ge);
+                        if (format.equals("scores")) {
+                            output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                        } else if (format.equals("ali")) {
+                            String[] stringsAligned = alignment.alignment.split("\n");
+                            output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                            output += pair[0] + ": " + stringsAligned[0] + "\n";
+                            output += pair[1] + ": " + stringsAligned[1] + "\n";
+                        } else if (format.equals("html")) {
+
+                        }
+                    } else if (mode.equals("freeshift")) {
+                        alignment = new FreeshiftGotoh(seq1, seq2, matrix, go, ge);
+                        if (format.equals("scores")) {
+                            output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                        } else if (format.equals("ali")) {
+                            String[] stringsAligned = alignment.alignment.split("\n");
+                            output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                            output += pair[0] + ": " + stringsAligned[0] + "\n";
+                            output += pair[1] + ": " + stringsAligned[1] + "\n";
+                        } else if (format.equals("html")) {
+
+                        }
                     }
 
                     // Print alignment results
