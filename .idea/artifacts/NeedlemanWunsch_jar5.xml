@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="NeedlemanWunsch:jar5">
+    <output-path>$PROJECT_DIR$/out/artifacts/NeedlemanWunsch_jar5</output-path>
+    <root id="archive" name="NeedlemanWunsch.jar">
+      <element id="module-output" name="NeedlemanWunsch" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src" />
+    </root>
+  </artifact>
+</component>

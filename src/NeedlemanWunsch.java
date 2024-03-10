@@ -1,4 +1,3 @@
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -12,10 +11,6 @@ public class NeedlemanWunsch {
 
     static double[][] dp;
 
-    public static double[][] getDP() {
-        return dp;
-    }
-
     public static void initializeMatrix(String P, String S, ScoringMatrix scoringMatrix, int gapExtendPenalty, String mode) {
         int m = P.length();
         int n = S.length();
@@ -26,10 +21,10 @@ public class NeedlemanWunsch {
         if (mode.equals("global")) {
             // Initialize the first row and first column
             for (int i = 1; i <= m; i++) {
-                dp[i][0] = (double) (i * gapExtendPenalty);
+                dp[i][0] = i * gapExtendPenalty;
             }
             for (int j = 1; j <= n; j++) {
-                dp[0][j] = (double) (j * gapExtendPenalty);
+                dp[0][j] = j * gapExtendPenalty;
             }
         } else if (mode.equals("local") || mode.equals("freeshift")) {
             // Initialize the first row and first column
@@ -74,8 +69,6 @@ public class NeedlemanWunsch {
             score = dp[m][n];
         } else if (mode.equals("local")) {
             double maxScore = Integer.MIN_VALUE;
-            double maxI = 0;
-            double maxJ = 0;
             for (int i = 0; i < dp.length; i++) {
                 for (int j = 0; j < dp[0].length; j++) {
                     if (dp[i][j] > maxScore) {
@@ -105,10 +98,7 @@ public class NeedlemanWunsch {
     }
 
     public static double needlemanWunsch(String P, String S, ScoringMatrix scoringMatrix, int gapExtendPenalty, String mode) throws IOException {
-        int m = P.length();
-        int n = S.length();
         initializeMatrix(P, S, scoringMatrix, gapExtendPenalty, mode);
-
         double score = 0;
         if (mode.equals("global")) {
             alignment = backtracking(P, S, dp, scoringMatrix, gapExtendPenalty);
@@ -201,70 +191,14 @@ public class NeedlemanWunsch {
             }
         }
 
-        String prefixP = P.substring(0, k);
-        String prefixS = S.substring(0, l);
-        String suffixP = P.substring(maxI, P.length());
-        String suffixS = S.substring(maxJ, S.length());
-        int prefixPLength = prefixP.length();
-        int prefixSLength = prefixS.length();
-        int suffixPLength = suffixP.length();
-        int suffixSLength = suffixS.length();
+        String[] prefixSuffix = prefixSuffixHandler(P, S, k, l, maxI, maxJ);
 
-        if (prefixPLength > prefixSLength) {
-            for (int i = 0; i < prefixPLength; i++) {
-                prefixS = prefixS + "-";
-            }
-            for (int i = 0; i < prefixSLength; i++) {
-                prefixP = "-" + prefixP;
-            }
-        } else if (prefixSLength > prefixPLength) {
-            for (int i = 0; i < prefixSLength ; i++) {
-                prefixP = prefixP + "-";
-            }
-            for (int i = 0; i < prefixPLength; i++) {
-                prefixS = "-" + prefixS;
-            }
-        }
-
-        if (suffixPLength > suffixSLength) {
-            for (int i = 0; i < suffixPLength; i++) {
-                suffixS = "-" + suffixS;
-            }
-            for (int i = 0; i < suffixSLength; i++) {
-                suffixP = suffixP + "-";
-            }
-        } else if (suffixSLength > suffixPLength) {
-            for (int i = 0; i < suffixSLength ; i++) {
-                suffixP = "-" + suffixP;
-            }
-            for (int i = 0; i < suffixPLength; i++) {
-                suffixS = suffixS + "-";
-            }
-        }
-
-        if (prefixPLength == prefixSLength) {
-            for (int i = 0; i < prefixPLength; i++) {
-                prefixS = "-" + prefixS;
-                prefixP = prefixP + "-";
-            }
-        }
-
-        if (suffixPLength == suffixSLength) {
-            for (int i = 0; i < suffixPLength; i++) {
-                suffixS = "-" + suffixS;
-                suffixP = suffixP + "-";
-            }
-        }
-
-        // Reverse the alignment strings
         String alignedPString = alignedP.reverse().toString();
         String alignedSString = alignedS.reverse().toString();
 
-        alignedPString = prefixP + alignedPString + suffixP;
-        alignedSString = prefixS + alignedSString + suffixS;
+        alignedPString = prefixSuffix[0] + alignedPString + prefixSuffix[2];
+        alignedSString = prefixSuffix[1] + alignedSString + prefixSuffix[3];
 
-
-        // Add the alignment strings to the list
         alignment.add(alignedPString);
         alignment.add(alignedSString);
         return alignment;
@@ -313,7 +247,6 @@ public class NeedlemanWunsch {
         int maxJ = l;
 
         while (k > 0 && l > 0) {
-
             if (m[k][l] == m[k - 1][l - 1] + scoringMatrix.getScore(PArray[k - 1], SArray[l - 1])) {
                 alignedP.append(PArray[k - 1]);
                 alignedS.append(SArray[l - 1]);
@@ -330,10 +263,24 @@ public class NeedlemanWunsch {
             }
         }
 
+        String[] prefixSuffix = prefixSuffixHandler(P, S, k, l, maxI, maxJ);
+
+        String alignedPString = alignedP.reverse().toString();
+        String alignedSString = alignedS.reverse().toString();
+
+        alignedPString = prefixSuffix[0] + alignedPString + prefixSuffix[2];
+        alignedSString = prefixSuffix[1] + alignedSString + prefixSuffix[3];
+
+        alignment.add(alignedPString);
+        alignment.add(alignedSString);
+        return alignment;
+    }
+
+    public static String[] prefixSuffixHandler (String P, String S, int k, int l, int maxI, int maxJ) {
         String prefixP = P.substring(0, k);
         String prefixS = S.substring(0, l);
-        String suffixP = P.substring(maxI, P.length());
-        String suffixS = S.substring(maxJ, S.length());
+        String suffixP = P.substring(maxI);
+        String suffixS = S.substring(maxJ);
 
         int prefixPLength = prefixP.length();
         int prefixSLength = prefixS.length();
@@ -385,19 +332,6 @@ public class NeedlemanWunsch {
                 suffixP = suffixP + "-";
             }
         }
-
-        // Reverse the alignment strings
-        String alignedPString = alignedP.reverse().toString();
-        String alignedSString = alignedS.reverse().toString();
-
-        alignedPString = prefixP + alignedPString + suffixP;
-        alignedSString = prefixS + alignedSString + suffixS;
-
-
-        // Add the alignment strings to the list
-        alignment.add(alignedPString);
-        alignment.add(alignedSString);
-        return alignment;
+        return new String[]{prefixP, prefixS, suffixP, suffixS};
     }
-
 }

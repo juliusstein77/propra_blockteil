@@ -35,6 +35,7 @@ public class Runner {
         parser.addOption("format", true);
         parser.addOption("dpmatrices", false);
         parser.addSwitch("check");
+        parser.addSwitch("val");
 
         try {
             parser.parse(args);
@@ -48,11 +49,12 @@ public class Runner {
             String format = parser.getOptionValue("format");
             String dpMatricesPath = parser.getOptionValue("dpmatrices");
             boolean check = parser.getSwitchValue("check");
+            boolean val = parser.getSwitchValue("val");
 
             //TODO: Parse all necessary command line arguments (-m with only 1 hyphen)
             //TODO: modify the output accordingly
             // necessary command line arguments: --pairs, --seqlib, -m, --go, --ge, --mode, --nw, --format, --dpmatrices, --check
-            //already implemented: --pairs, --seqlib, -m, --go, --ge, --mode, --nw, --format,
+            //already implemented: --pairs, --seqlib, -m, --go, --ge, --mode, --nw, --format, --dpmatrices
 
             // Convert string arguments to appropriate data types
             int go = goStr != null ? Integer.parseInt(goStr) : -12; // Default gap open penalty
@@ -70,8 +72,8 @@ public class Runner {
 
             // For each pair of sequences, perform alignment and print results
             for (String[] pair : pairsReader.readPairs(pairsFile)) {
-                String seq1 = sequenceLibrary.get(pair[0]);
-                String seq2 = sequenceLibrary.get(pair[1]);
+                String seq1 = sequenceLibrary.get(pair[0]).replace("-", "");
+                String seq2 = sequenceLibrary.get(pair[1]).replace("-", "");
                 // Perform alignment using seq1 and seq2, match score (match), gap penalties (go, ge)
                 double score = 0;
                 // Use Needleman-Wunsch algorithm
@@ -89,6 +91,23 @@ public class Runner {
                         for (int i = 0; i < NeedlemanWunsch.getAlignment().size(); i++) {
                             System.out.println(pair[i] + ": " + NeedlemanWunsch.getAlignment().get(i));
                         }
+                        if (val) {
+                            //TODO: remove gap overhangs
+                            String refSeq1 = sequenceLibrary.get(pair[0]);
+                            String refSeq2 = sequenceLibrary.get(pair[1]);
+                            if (refSeq1.length() != refSeq2.length()) {
+                                throw new IllegalArgumentException("Sequences are not of the same length");
+                            }
+                            for (int i = 0; i < refSeq2.length(); i++) {
+                                if (refSeq1.charAt(i) == '-' && refSeq2.charAt(i) == '-') {
+                                    refSeq1 = refSeq1.substring(0, i) + refSeq1.substring(i + 1);
+                                    refSeq2 = refSeq2.substring(0, i) + refSeq2.substring(i + 1);
+                                    i++;
+                                }
+                            }
+                            System.out.println(pair[0] + ": " + refSeq1);
+                            System.out.println(pair[1] + ": " + refSeq2);
+                        }
                     } else if (format.equals("html")) {
                         //TODO: Implement HTML output
                     }
@@ -102,49 +121,50 @@ public class Runner {
                     String output = "";
                     Gotoh alignment = new Gotoh(seq1, seq2, matrix, go, ge);
 
-
-
                     if (mode.equals("global")){
                         alignment = new GlobalGotoh(seq1, seq2, matrix, go, ge);
-                        if (format.equals("scores")) {
-                            output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                        } else if (format.equals("ali")) {
-                            String[] stringsAligned = alignment.alignment.split("\n");
-                            output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                            output += pair[0] + ": " + stringsAligned[0] + "\n";
-                            output += pair[1] + ": " + stringsAligned[1] + "\n";
-                        } else if (format.equals("html")) {
-
-                        }
                     } else if (mode.equals("local")) {
                         alignment = new LocalGotoh(seq1, seq2, matrix, go, ge);
-                        if (format.equals("scores")) {
-                            output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                        } else if (format.equals("ali")) {
-                            String[] stringsAligned = alignment.alignment.split("\n");
-                            output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                            output += pair[0] + ": " + stringsAligned[0] + "\n";
-                            output += pair[1] + ": " + stringsAligned[1] + "\n";
-                        } else if (format.equals("html")) {
-
-                        }
                     } else if (mode.equals("freeshift")) {
                         alignment = new FreeshiftGotoh(seq1, seq2, matrix, go, ge);
-                        if (format.equals("scores")) {
-                            output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                        } else if (format.equals("ali")) {
-                            String[] stringsAligned = alignment.alignment.split("\n");
-                            output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
-                            output += pair[0] + ": " + stringsAligned[0] + "\n";
-                            output += pair[1] + ": " + stringsAligned[1] + "\n";
-                        } else if (format.equals("html")) {
+                    }
 
+                    if (format.equals("scores")) {
+                        output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                    } else if (format.equals("ali")) {
+                        String[] stringsAligned = alignment.alignment.split("\n");
+                        output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                        output += pair[0] + ": " + stringsAligned[0] + "\n";
+                        output += pair[1] + ": " + stringsAligned[1] + "\n";
+                        if (val) {
+                            String refSeq1 = sequenceLibrary.get(pair[0]);
+                            String refSeq2 = sequenceLibrary.get(pair[1]);
+                            if (refSeq1.length() != refSeq2.length()) {
+                                throw new IllegalArgumentException("Sequences are not of the same length");
+                            }
+                            for (int i = 0; i < refSeq2.length(); i++) {
+                                if (refSeq1.charAt(i) == '-' && refSeq2.charAt(i) == '-') {
+                                    refSeq1 = refSeq1.substring(0, i) + refSeq1.substring(i + 1);
+                                    refSeq2 = refSeq2.substring(0, i) + refSeq2.substring(i + 1);
+                                    i++;
+                                }
+                            }
+                            output += pair[0] + ": " + refSeq1 + "\n";
+                            output += pair[1] + ": " + refSeq2;
                         }
+
+                    } else if (format.equals("html")) {
+                        //TODO: Implement HTML output
+                    }
+
+                    if (dpMatricesPath != null) {
+                        printMatrixToFile(alignment.mx_a, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_a.txt");
+                        printMatrixToFile(alignment.mx_i, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_i.txt");
+                        printMatrixToFile(alignment.mx_d, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_d.txt");
                     }
 
                     // Print alignment results
                     System.out.println(output);
-
                 }
 
             }
