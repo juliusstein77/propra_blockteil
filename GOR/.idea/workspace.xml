@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="gor_eval:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2ef74a53-5a7b-45d8-a02a-37c49e9266c3" name="Changes" comment="Added some comments, created extendSecondarySequence Method">
+      <change beforePath="$PROJECT_DIR$/CB513DSSP.db_toPlot.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CB513DSSP.db_toPlot.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/detailedSum.txt" beforeDir="false" afterPath="$PROJECT_DIR$/detailedSum.txt" afterDir="false" />
+    </list>
+    <list id="3576ce63-e301-4332-beaf-1756af14f50d" name="Changes by malte" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="gor_1_final" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectId" id="2dGovyOGjPprAXVP2qU76md9ZTh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/maxi/Documents/Uni/ProPra/blockgruppe3/GOR&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  }
+}</component>
+  <component name="RunManager" selected="Application.ValidateMain">
+    <configuration name="GORMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="GORMain" />
+      <module name="GOR" />
+      <option name="PROGRAM_PARAMETERS" value="--model gor4cb513dssp.mod --maf AlignmentFiles/CB513MultipleAlignments --format txt" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TrainerMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="TrainerMain" />
+      <module name="GOR" />
+      <option name="PROGRAM_PARAMETERS" value="--method gor4 --db CB513DSSP.db --model gor4cb513dssp.mod" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ValidateMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="ValidateMain" />
+      <option name="PROGRAM_PARAMETERS" value="-p GOR_V_PREDICTIONS.txt -r CB513DSSP.db -s sum.txt -d detailedSum.txt -f txt" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.ValidateMain" />
+      <item itemvalue="Application.GORMain" />
+      <item itemvalue="Application.TrainerMain" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ValidateMain" />
+        <item itemvalue="Application.GORMain" />
+        <item itemvalue="Application.TrainerMain" />
+        <item itemvalue="Application.GORMain" />
+        <item itemvalue="Application.TrainerMain" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2ef74a53-5a7b-45d8-a02a-37c49e9266c3" name="Changes" comment="" />
+      <created>1709644010499</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1709644010499</updated>
+      <workItem from="1709644011631" duration="5580000" />
+      <workItem from="1709649611131" duration="8423000" />
+      <workItem from="1709658689963" duration="1928000" />
+      <workItem from="1709660624858" duration="1193000" />
+      <workItem from="1709661824413" duration="891000" />
+      <workItem from="1709663311366" duration="1279000" />
+      <workItem from="1709664598159" duration="311000" />
+      <workItem from="1709664917992" duration="2850000" />
+      <workItem from="1709669820177" duration="2579000" />
+      <workItem from="1709712950175" duration="5202000" />
+      <workItem from="1709719280555" duration="600000" />
+      <workItem from="1709721013258" duration="12559000" />
+      <workItem from="1709733814794" duration="18863000" />
+      <workItem from="1709758503553" duration="2892000" />
+      <workItem from="1709798493127" duration="17866000" />
+      <workItem from="1709887371284" duration="28000" />
+      <workItem from="1709893713339" duration="2235000" />
+      <workItem from="1709897143703" duration="10874000" />
+      <workItem from="1709914994994" duration="5013000" />
+      <workItem from="1709981161941" duration="20485000" />
+      <workItem from="1710008153841" duration="1381000" />
+    </task>
+    <task id="LOCAL-00001" summary="Successfully predicting sheet :]]">
+      <created>1709652120094</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1709652120094</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Put the Loops of slideWindowAndPredict in an extra method">
+      <created>1709659207675</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1709659207675</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added some comments, created extendSecondarySequence Method">
+      <created>1709659966671</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1709659966671</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Added some comments, created extendSecondarySequence Method">
+      <created>1709663842830</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1709663842830</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Successfully predicting sheet :]]" />
+    <MESSAGE value="Changes by malte" />
+    <MESSAGE value="Put the Loops of slideWindowAndPredict in an extra method" />
+    <MESSAGE value="Added some comments, created extendSecondarySequence Method" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added some comments, created extendSecondarySequence Method" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.StringIndexOutOfBoundsException" package="java.lang" />
+          <option name="timeStamp" value="6" />
+        </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.NullPointerException" package="java.lang" />
+          <option name="timeStamp" value="32" />
+        </breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
+          <option name="timeStamp" value="36" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="Sequence" memberName="statValues" />
+      </pinned-members>
+    </pin-to-top-manager>
+  </component>
+</project>

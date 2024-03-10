@@ -1,7 +1,8 @@
 import gzip
 import multiprocessing
+import tqdm
 
-NUM_PROCESSES = 16
+NUM_PROCESSES = 10
 
 
 def calculate_ncd_row(data_row, seq_dict):
@@ -46,38 +47,54 @@ def calculate_ncd(data):
     return id, [ncd(seq, seq_dict[id_2]) for id_2 in seq_dict if id_2 != id]
 
 
+import tqdm
+
 if __name__ == "__main__":
-    seq_dict = read_seq_data("/home/malte/projects/blockgruppe3/CB513DSSP.db")
+    seq_dict = read_seq_data("seclib_file_7k.db")
 
     score_dict = {}
 
     # calculate scores for each seq against all other seqs
     with multiprocessing.Pool(NUM_PROCESSES) as pool:
         data = [(id, seq, seq_dict) for id, seq in seq_dict.items()]
-        results = pool.map(calculate_ncd, data)
-        
+
+        # Initialize tqdm progress bar
+        progress_bar = tqdm.tqdm(total=len(data), desc="Calculating scores")
+
+        results = []
+        for result in pool.imap_unordered(calculate_ncd, data):
+            results.append(result)
+            # Update progress bar
+            progress_bar.update(1)
+
+        # Close the progress bar
+        progress_bar.close()
+
         for id, scores in results:
             score_dict[id] = scores
 
     # compute sum of scores for each ID
     sum_scores = {id: sum(scores) for id, scores in score_dict.items()}
 
-
     # normalize
-    min = min(sum_scores.values())
-    max = max(sum_scores.values())
+    min_score = min(sum_scores.values())
+    max_score = max(sum_scores.values())
 
     norm_scores_dict = {}
     for id, score in sum_scores.items():
-        norm = (score - min) / (max - min)
+        norm = (score - min_score) / (max_score - min_score)
         norm_scores_dict[id] = norm
 
     for id, norm in norm_scores_dict.items():
         print(id, norm)
 
-    print("Normalized score rating ", 1 - (min / max))
-    print("Seqs looked at " , len(seq_dict.keys()))
+    with open("seq_similarity.txt", "w") as f:
+        for id, norm in norm_scores_dict.items():
+            f.write(f"{id} {norm}\n")
 
+        f.write(f"\nMax value: {max_score}\n")
+        f.write(f"Normalize-trust-score: {1 - (min_score / max_score)}\n")
+        f.write(f"Seqs looked at: {len(seq_dict.keys())}\n")
 
 
 
