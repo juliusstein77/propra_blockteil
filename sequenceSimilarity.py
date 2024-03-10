@@ -76,6 +76,7 @@ if __name__ == "__main__":
         print(id, norm)
 
     print("Normalized score rating ", 1 - (min / max))
+    print("Seqs looked at " , len(seq_dict.keys()))
 
 
 
