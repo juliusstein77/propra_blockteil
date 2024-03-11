@@ -19,8 +19,8 @@ public class Helpers {
                 if (!line.isEmpty()){
                     String head = line.substring(0,6);
                     if (head.equals("MATRIX")){
-                        String tabuOrspace = line.substring(7,7);
-                        if (tabuOrspace.equals("\\s")){
+                        String tabuOrspace = line.substring(7,8);
+                        if (tabuOrspace.equals(" ")){
                             String matriceRow = line.substring(11);
                             String[] matriceSplitted = matriceRow.split("\\s{5,7}");
                             int c = 0;
