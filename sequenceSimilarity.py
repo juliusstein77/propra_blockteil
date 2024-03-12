@@ -1,5 +1,9 @@
 import gzip
 import multiprocessing
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+from scipy.cluster.hierarchy import dendrogram, linkage
 
 NUM_PROCESSES = 16
 
@@ -17,7 +21,7 @@ def ncd(x:str, x2:str) -> float:
     :param x2: Sequence 2
     :return: normalized compression dist
     """
-    x_compressed = len(gzip.compress(x.encode()))
+    x_compressed = len(gzip.compress(x.encode())) 
     x2_compressed = len(gzip.compress(x2.encode()))
     xx2 = len(gzip.compress(("".join([x,x2])).encode()))
 
@@ -41,13 +45,17 @@ def read_seq_data(path_to_data):
     return seq_dict
 
 
+# def calculate_ncd(data):
+#     id, seq, seq_dict = data
+#     return id, [ncd(seq, seq_dict[id_2]) for id_2 in seq_dict if id_2 ]
+
 def calculate_ncd(data):
     id, seq, seq_dict = data
-    return id, [ncd(seq, seq_dict[id_2]) for id_2 in seq_dict if id_2 != id]
+    return id, [ncd(seq, seq_dict[id_2]) for id_2 in seq_dict]  # get all scores for each seq
 
 
 if __name__ == "__main__":
-    seq_dict = read_seq_data("/home/malte/projects/blockgruppe3/CB513DSSP.db")
+    seq_dict = read_seq_data("/home/malte/projects/blockgruppe3/cb513.db")
 
     score_dict = {}
 
@@ -62,24 +70,29 @@ if __name__ == "__main__":
     # compute sum of scores for each ID
     sum_scores = {id: sum(scores) for id, scores in score_dict.items()}
 
+    # create score matrix
+    # clutser based on score matrix
+    score_matrix = np.zeros((len(seq_dict.keys()), len(seq_dict.keys())))
+    for i, id in enumerate(seq_dict.keys()):
+        score_matrix[i] = score_dict[id]
 
+    
     # normalize
     min = min(sum_scores.values())
     max = max(sum_scores.values())
 
     norm_scores_dict = {}
+    
     for id, score in sum_scores.items():
         norm = (score - min) / (max - min)
         norm_scores_dict[id] = norm
 
-    for id, norm in norm_scores_dict.items():
-        print(id, norm)
-
-    print("Normalized score rating ", 1 - (min / max))
-    print("Seqs looked at " , len(seq_dict.keys()))
-
-
-
 
     
+
+    sns.clustermap(score_matrix, cmap='viridis', method='average', figsize=(14, 10))
+    plt.title('Heatmap of NCD scores for each sequence in CB513')
+    plt.xlabel('Sequence Index', fontsize=12)
+    plt.ylabel('Sequence Index', fontsize=12)
+    plt.show()
 
