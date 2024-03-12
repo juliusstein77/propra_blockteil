@@ -5,7 +5,7 @@ import numpy as np
 import seaborn as sns
 import argparse
 
-NUM_PROCESSES = 8
+NUM_PROCESSES = 16
 
 
 def calculate_ncd_row(data_row, seq_dict):
