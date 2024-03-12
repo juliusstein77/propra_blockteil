@@ -3,7 +3,6 @@ import multiprocessing
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from scipy.cluster.hierarchy import dendrogram, linkage
 
 NUM_PROCESSES = 16
 
@@ -45,18 +44,38 @@ def read_seq_data(path_to_data):
     return seq_dict
 
 
-# def calculate_ncd(data):
-#     id, seq, seq_dict = data
-#     return id, [ncd(seq, seq_dict[id_2]) for id_2 in seq_dict if id_2 ]
-
 def calculate_ncd(data):
     id, seq, seq_dict = data
     return id, [ncd(seq, seq_dict[id_2]) for id_2 in seq_dict]  # get all scores for each seq
 
 
+def filter_similar_sequences(score_matrix, sequence_ids, threshold):
+    similar_sequences = set()
+
+    # Find pairs of sequences with similarity above the threshold
+    for i in range(len(sequence_ids)):
+        for j in range(i + 1, len(sequence_ids)):
+            if score_matrix[i, j] < threshold:
+                similar_sequences.add(sequence_ids[i])
+                similar_sequences.add(sequence_ids[j])
+
+    # Return the IDs of sequences to remove
+    return similar_sequences
+
+def remove_similar_sequences(score_matrix, similar_sequences):
+    # get the index of the similar sequences
+    similar_sequences = [list(seq_dict.keys()).index(seq_id) for seq_id in similar_sequences]
+
+    # now we removed the ids from the dict, we need to remove the rows and columns from the score matrix
+    score_matrix = np.delete(score_matrix, similar_sequences, axis=0)
+    score_matrix = np.delete(score_matrix, similar_sequences, axis=1)
+
+    return score_matrix
+
+
 if __name__ == "__main__":
-    seq_dict = read_seq_data("/home/malte/projects/blockgruppe3/cb513.db")
-    # seq_dict = read_seq_data("/home/malte/temp/GOR_JARS/vali/validation/filtered_seclib_7k.db")
+    # seq_dict = read_seq_data("/home/malte/projects/blockgruppe3/cb513.db")
+    seq_dict = read_seq_data("/home/malte/temp/GOR_JARS/vali/validation/filtered_seclib_7k.db")
 
     score_dict = {}
 
@@ -76,15 +95,42 @@ if __name__ == "__main__":
     for i, id in enumerate(seq_dict.keys()):
         score_matrix[i] = score_dict[id]
 
-    # sns.clustermap(score_matrix, method='average', figsize=(14, 10), row_cluster=True, col_cluster=True)
-
-    cg = sns.clustermap(score_matrix, method='average', figsize=(14, 10))
+    cg = sns.clustermap(score_matrix, method='average', figsize=(14, 10), annot=False)
     cg.ax_row_dendrogram.set_visible(False)
     cg.ax_col_dendrogram.set_visible(False)
+    cg.ax_heatmap.set_xticklabels([])
+    cg.ax_heatmap.set_yticklabels([])
 
-    plt.title('Heatmap of NCD\nscores for each\nsequence in CB513')
-    plt.xlabel('Sequence Index', fontsize=12)
-    plt.ylabel('Sequence Index', fontsize=12)
+
+    cg.fig.suptitle('Heatmap of NCD scores for each sequence in Filtered7k.db', fontsize=16)
     cg.cax.set_position([0.1, 0.1, 0.02, 0.6])  # Adjust position [left, bottom, width, height]
-    plt.savefig('CB513_heatmap.png')
-    plt.show()
+    plt.savefig('Filtered7k_heatmap.png')
+    
+
+    threshold = 0.6
+    similar_sequences = filter_similar_sequences(score_matrix, list(seq_dict.keys()), threshold)
+    print(len(similar_sequences))
+    score_matrix = remove_similar_sequences(score_matrix, similar_sequences)
+
+    # create new heatmap
+    cg = sns.clustermap(score_matrix, method='average', figsize=(14, 10), annot=False)
+    cg.ax_row_dendrogram.set_visible(False)
+    cg.ax_col_dendrogram.set_visible(False)
+    cg.ax_heatmap.set_xticklabels([])
+    cg.ax_heatmap.set_yticklabels([])
+    cg.fig.suptitle(f'Heatmap of NCD scores for each sequence in Filtered7k.db with {threshold} as threshold', fontsize=16)
+    cg.cax.set_position([0.1, 0.1, 0.02, 0.6])  # Adjust position [left, bottom, width, height]
+    plt.savefig('Filtered7k_heatmap_filtered.png')
+
+
+    # now save all ids that are kept in the filtered dict in a file
+    with open("filtered_sequences.txt", "w") as f:
+        for id in seq_dict.keys():
+            if id not in similar_sequences:
+                f.write(id + "\n")
+
+
+
+
+
+
