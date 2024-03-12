@@ -56,6 +56,7 @@ def calculate_ncd(data):
 
 if __name__ == "__main__":
     seq_dict = read_seq_data("/home/malte/projects/blockgruppe3/cb513.db")
+    # seq_dict = read_seq_data("/home/malte/temp/GOR_JARS/vali/validation/filtered_seclib_7k.db")
 
     score_dict = {}
 
@@ -67,32 +68,23 @@ if __name__ == "__main__":
         for id, scores in results:
             score_dict[id] = scores
 
-    # compute sum of scores for each ID
-    sum_scores = {id: sum(scores) for id, scores in score_dict.items()}
-
     # create score matrix
     # clutser based on score matrix
     score_matrix = np.zeros((len(seq_dict.keys()), len(seq_dict.keys())))
+
+    # fill matrix
     for i, id in enumerate(seq_dict.keys()):
         score_matrix[i] = score_dict[id]
 
-    
-    # normalize
-    min = min(sum_scores.values())
-    max = max(sum_scores.values())
+    # sns.clustermap(score_matrix, method='average', figsize=(14, 10), row_cluster=True, col_cluster=True)
 
-    norm_scores_dict = {}
-    
-    for id, score in sum_scores.items():
-        norm = (score - min) / (max - min)
-        norm_scores_dict[id] = norm
+    cg = sns.clustermap(score_matrix, method='average', figsize=(14, 10))
+    cg.ax_row_dendrogram.set_visible(False)
+    cg.ax_col_dendrogram.set_visible(False)
 
-
-    
-
-    sns.clustermap(score_matrix, cmap='viridis', method='average', figsize=(14, 10))
-    plt.title('Heatmap of NCD scores for each sequence in CB513')
+    plt.title('Heatmap of NCD\nscores for each\nsequence in CB513')
     plt.xlabel('Sequence Index', fontsize=12)
     plt.ylabel('Sequence Index', fontsize=12)
+    cg.cax.set_position([0.1, 0.1, 0.02, 0.6])  # Adjust position [left, bottom, width, height]
+    plt.savefig('CB513_heatmap.png')
     plt.show()
-
