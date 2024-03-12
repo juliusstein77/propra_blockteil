@@ -3,8 +3,9 @@ import multiprocessing
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+import argparse
 
-NUM_PROCESSES = 16
+NUM_PROCESSES = 8
 
 
 def calculate_ncd_row(data_row, seq_dict):
@@ -30,6 +31,7 @@ def ncd(x:str, x2:str) -> float:
 def read_seq_data(path_to_data):
     lines = []
     seq_dict = {}
+    detailed_seq_dict = {}
     with open(path_to_data) as f:
         lines = f.readlines()
 
@@ -40,8 +42,9 @@ def read_seq_data(path_to_data):
             s_aa = lines[i+1][3:].strip("\n")
             s_ss = lines[i+2][3:].strip("\n")
             seq_dict[s_id] = s_aa + s_ss
+            detailed_seq_dict[s_id] = (s_aa, s_ss)
 
-    return seq_dict
+    return seq_dict, detailed_seq_dict
 
 
 def calculate_ncd(data):
@@ -74,8 +77,23 @@ def remove_similar_sequences(score_matrix, similar_sequences):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', type=str, required=True)
+    parser.add_argument('-t', type=float, default=0.5)
+    args = parser.parse_args()
+    
+
+    data_path = args.d
+    threshold = args.t
+    plot_name = ""
+
+    if "/" in data_path:
+        plot_name = data_path.split(".")[-2].split("/")[-1]
+    else:
+        plot_name = data_path.split(".")[-2]
+
     # seq_dict = read_seq_data("/home/malte/projects/blockgruppe3/cb513.db")
-    seq_dict = read_seq_data("/home/malte/temp/GOR_JARS/vali/validation/filtered_seclib_7k.db")
+    seq_dict, detailed_seq_dict = read_seq_data(data_path)
 
     score_dict = {}
 
@@ -95,39 +113,47 @@ if __name__ == "__main__":
     for i, id in enumerate(seq_dict.keys()):
         score_matrix[i] = score_dict[id]
 
-    cg = sns.clustermap(score_matrix, method='average', figsize=(14, 10), annot=False)
+    cg = sns.clustermap(score_matrix, method='average', figsize=(12, 8), annot=False)
     cg.ax_row_dendrogram.set_visible(False)
     cg.ax_col_dendrogram.set_visible(False)
     cg.ax_heatmap.set_xticklabels([])
     cg.ax_heatmap.set_yticklabels([])
 
 
-    cg.fig.suptitle('Heatmap of NCD scores for each sequence in Filtered7k.db', fontsize=16)
+    cg.fig.suptitle(f'Heatmap of NCD scores for each sequence in {plot_name}', fontsize=20)
     cg.cax.set_position([0.1, 0.1, 0.02, 0.6])  # Adjust position [left, bottom, width, height]
-    plt.savefig('Filtered7k_heatmap.png')
+    plt.savefig(f'{plot_name}.png')
     
 
-    threshold = 0.6
     similar_sequences = filter_similar_sequences(score_matrix, list(seq_dict.keys()), threshold)
-    print(len(similar_sequences))
+    
     score_matrix = remove_similar_sequences(score_matrix, similar_sequences)
 
+    print(f"Number of sequences found in {plot_name}: {len(seq_dict)}")
+    print(f"Removing {len(similar_sequences)} sequences from {plot_name} having a similarity score of < {threshold}")
+    print(f"Remaining sequences: {len(seq_dict) - len(similar_sequences)}")
+
     # create new heatmap
-    cg = sns.clustermap(score_matrix, method='average', figsize=(14, 10), annot=False)
+    cg = sns.clustermap(score_matrix, method='average', figsize=(12, 8), annot=False)
     cg.ax_row_dendrogram.set_visible(False)
     cg.ax_col_dendrogram.set_visible(False)
     cg.ax_heatmap.set_xticklabels([])
     cg.ax_heatmap.set_yticklabels([])
-    cg.fig.suptitle(f'Heatmap of NCD scores for each sequence in Filtered7k.db with {threshold} as threshold', fontsize=16)
+    # increase fint size of labels on legend
+    cg.cax.yaxis.set_tick_params(labelsize=10)
+
+    cg.fig.suptitle(f'Heatmap of NCD scores for each sequence in {plot_name} with {threshold} as threshold', fontsize=20)
     cg.cax.set_position([0.1, 0.1, 0.02, 0.6])  # Adjust position [left, bottom, width, height]
-    plt.savefig('Filtered7k_heatmap_filtered.png')
+    plt.savefig(f'{plot_name}_filtered.png')
 
 
     # now save all ids that are kept in the filtered dict in a file
-    with open("filtered_sequences.txt", "w") as f:
+    with open(f"filtered_sequences_{plot_name}.db", "w") as f:
         for id in seq_dict.keys():
             if id not in similar_sequences:
-                f.write(id + "\n")
+                f.write("> " + id + "\n")
+                f.write("AS " + detailed_seq_dict[id][0] + "\n")
+                f.write("SS " + detailed_seq_dict[id][1] + "\n")
 
 
 
