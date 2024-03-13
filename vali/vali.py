@@ -93,7 +93,7 @@ def create_folds(folds: int, file: str):
                 f.write(line[0] + '\n' + line[1] + '\n')
 
 
-def crossvalidate(folds: int, run_id: str, gor: list[int], name_of_db: str):
+def crossvalidate(folds: int, run_id: str, gor: list, name_of_db: str):
     for model in gor:
         paths_of_summary = []
         for fold in range(1, folds + 1):
@@ -122,7 +122,7 @@ def crossvalidate(folds: int, run_id: str, gor: list[int], name_of_db: str):
 
 
 
-def crossvalidate_gor_v(folds: int, run_id: str, gor: list[int], name_of_db: str):
+def crossvalidate_gor_v(folds: int, run_id: str, gor: list, name_of_db: str):
     for model in gor:
         paths_of_summary = []
         for fold in range(1, folds + 1):
@@ -151,7 +151,7 @@ def crossvalidate_gor_v(folds: int, run_id: str, gor: list[int], name_of_db: str
         write_summary_to_file(paths_of_summary, name_of_db)
 
 
-def write_summary_to_file(paths: list[str], name_of_db: str):
+def write_summary_to_file(paths: list, name_of_db: str):
 
     summary_out_path = paths[0].split(".")[0].replace("fold1_", "") + "_ALL.scores"
     os.system(f"touch {summary_out_path}")
