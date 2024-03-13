@@ -80,11 +80,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', type=str, required=True)
     parser.add_argument('-t', type=float, default=0.5)
+    parser.add_argument('-filtered_png', type=str)
+    parser.add_argument('-no_filter_png', type=str)
+    parser.add_argument('-filtered_db', type=str)
+
     args = parser.parse_args()
     
 
     data_path = args.d
     threshold = args.t
+    filtered_png = args.filtered_png
+    no_filter_png = args.no_filter_png
+    filtered_db = args.filtered_db
     plot_name = ""
 
     if "/" in data_path:
@@ -122,16 +129,12 @@ if __name__ == "__main__":
 
     cg.fig.suptitle(f'Heatmap of NCD scores for each sequence in {plot_name}', fontsize=20)
     cg.cax.set_position([0.1, 0.1, 0.02, 0.6])  # Adjust position [left, bottom, width, height]
-    plt.savefig(f'{plot_name}.png')
+    plt.savefig(f'{no_filter_png}.png')
     
 
     similar_sequences = filter_similar_sequences(score_matrix, list(seq_dict.keys()), threshold)
     
     score_matrix = remove_similar_sequences(score_matrix, similar_sequences)
-
-    print(f"Number of sequences found in {plot_name}: {len(seq_dict)}")
-    print(f"Removing {len(similar_sequences)} sequences from {plot_name} having a similarity score of < {threshold}")
-    print(f"Remaining sequences: {len(seq_dict) - len(similar_sequences)}")
 
     # create new heatmap
     cg = sns.clustermap(score_matrix, method='average', figsize=(12, 8), annot=False)
@@ -144,11 +147,11 @@ if __name__ == "__main__":
 
     cg.fig.suptitle(f'Heatmap of NCD scores for each sequence in {plot_name} with {threshold} as threshold', fontsize=20)
     cg.cax.set_position([0.1, 0.1, 0.02, 0.6])  # Adjust position [left, bottom, width, height]
-    plt.savefig(f'{plot_name}_filtered.png')
+    plt.savefig(f'{filtered_png}.png')
 
 
     # now save all ids that are kept in the filtered dict in a file
-    with open(f"filtered_sequences_{plot_name}.db", "w") as f:
+    with open(f"{filtered_db}", "w") as f:
         for id in seq_dict.keys():
             if id not in similar_sequences:
                 f.write("> " + id + "\n")
