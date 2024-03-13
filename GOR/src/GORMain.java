@@ -1,3 +1,4 @@
+import constants.Constants;
 import utils.CmdParser;
 
 import java.io.BufferedWriter;
@@ -47,7 +48,10 @@ public class GORMain {
                 CalcGOR_I gorI = new CalcGOR_I(pathToModel, fastaPath, gorType, probabilities);
                 //HashMap<Character, Integer> test = gorI.calcStructureOccurrencies();
                 gorI.predict();
-                predictions = gorI.getSequencesToPredict(); // for post processing
+                if(postProc) {
+                    predictions = gorI.getSequencesToPredict();
+                    postProcess(predictions);
+                }
                 if (format.equals("txt")){
                     System.out.println(gorI.predictionsToString(probabilities));
                 } else if (format.equals("html")) {
@@ -56,7 +60,10 @@ public class GORMain {
             } else if (gorType == 3) {
                 CalcGOR_III gorIII = new CalcGOR_III(pathToModel, fastaPath, probabilities);
                 gorIII.predict();
-                predictions = gorIII.getSequencesToPredict();  // for post processing
+                if(postProc) {
+                    predictions = gorIII.getSequencesToPredict();
+                    postProcess(predictions);
+                }
                 if (format.equals("txt")){
                     System.out.println(gorIII.predictionsToString(probabilities));
                 } else if (format.equals("html")) {
@@ -65,7 +72,10 @@ public class GORMain {
             } else if (gorType == 4) {
                 CalcGOR_IV gorIV = new CalcGOR_IV(pathToModel, fastaPath, probabilities);
                 gorIV.predict();
-                predictions = gorIV.getSequencesToPredict();  // for post processing
+                if(postProc) {
+                    predictions = gorIV.getSequencesToPredict();  // for post processing
+                    postProcess(predictions);
+                }
                 if (format.equals("txt")){
                     System.out.println(gorIV.predictionsToString(probabilities));
                 } else if (format.equals("html")) {
@@ -78,13 +88,31 @@ public class GORMain {
             int gorType = getGorType(pathToModel);
             CalcGOR_V gor_v = new CalcGOR_V(pathToModel, mafPath, gorType, probabilities);
             gor_v.predict();
-            predictions = gor_v.getSequencesToPredict();  // for post processing
+            if(postProc) {
+                predictions = gor_v.getSequencesToPredict();  // for post processing
+                postProcess(predictions);
+            }
             if (format.equals("txt")) {
                 System.out.println(gor_v.predictionsToString(probabilities));
             }
             else if (format.equals("html")) {
                toJson(gor_v.getSequencesToPredict());
             }
+        }
+    }
+
+    private static void postProcess(ArrayList<Sequence> predictions) {
+        for (Sequence sequence : predictions) {
+            StringBuilder seqBuilder = new StringBuilder(sequence.getSsSequence());
+
+            for (int i = Constants.WINDOW_SIZE.getValue() / 2; i < seqBuilder.length() - Constants.WINDOW_SIZE.getValue() / 2; i++) {
+                if (seqBuilder.charAt(i) != seqBuilder.charAt(i - 1) &&
+                        seqBuilder.charAt(i) != seqBuilder.charAt(i + 1) &&
+                        seqBuilder.charAt(i - 1) == seqBuilder.charAt(i + 1)) {
+                    seqBuilder.setCharAt(i, seqBuilder.charAt(i - 1));
+                }
+            }
+            sequence.setSsSequence(seqBuilder.toString());
         }
     }
 

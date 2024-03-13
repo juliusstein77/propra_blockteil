@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.stream.Stream;
 
 public class ValidateGOR {
 
@@ -22,9 +21,9 @@ public class ValidateGOR {
     private final int CHARS_BEFORE_SEQ = 3;
     private final int AA_SEQ_LINE = 1;
     private final int SS_SEQ_LINE = 2;
-    private final char[] secStructs = {'H', 'E', 'C'};
+    private final char[] SEC_STRUCTS = {'H', 'E', 'C'};
 
-    private final String[] orderOfScores = {"q3","qObs_H", "qObs_E", "qObs_C", "SOV", "SOV_H", "SOV_E", "SOV_C"};
+    private final String[] ORDER_OF_SCORES = {"q3", "qObs_H", "qObs_E", "qObs_C", "SOV", "SOV_H", "SOV_E", "SOV_C"};
     private final DecimalFormatSymbols symb = new DecimalFormatSymbols();
     private final DecimalFormat format;
 
@@ -41,37 +40,32 @@ public class ValidateGOR {
         // add predictions of predictionfile to seqs
         readPredictions(pathToPredictions);
 
-        for (char ss : secStructs) {
-            calculateQ0(ss);
+        for (char secondaryStruct : SEC_STRUCTS) {
+            calculateQ0(secondaryStruct);
         }
         calculateQ3();
         calculateSOV();
 
         if (plot) {
-            try {
-                // path to Summay File= /home/malte/temp/GOR_JARS/vali/validation/gor1_fold1_SUMMARY.txt
-                //String plotPath = pathToSummaryFile.split("\\.")[0] + "_plot.png";
-                String plotData = pathToSummaryFile.split("\\.")[0] + "_plot.scores";
-                // write results to plotting file
-                writeToFile(generatePlottingFile(), plotData);
-                String command = "python3 plotBoxplots.py " + plotData;
-                // Create ProcessBuilder
-                ProcessBuilder pb = new ProcessBuilder(command.split(" "));
-                // Start the process
-                Process process = pb.start();
-            } catch (IOException e) { e.printStackTrace(); }
+            // path to Summay File= /home/malte/temp/GOR_JARS/vali/validation/gor1_fold1_SUMMARY.txt
+            //String plotPath = pathToSummaryFile.split("\\.")[0] + "_plot.png";
+            String plotData = pathToSummaryFile.split("\\.")[0] + "_plot.scores";
+            // write results to plotting file
+            writeToFile(generatePlottingFile(), plotData);
+            String command = "python3 plotBoxplots.py " + plotData;
+            // Create ProcessBuilder
+            ProcessBuilder pb = new ProcessBuilder(command.split(" "));
+            // Start the process
+            Process process = pb.start();
         }
 
         if (toTxt) {
             writeToFile(generateDetailedSummary(), pathToDetailedFile);
             writeToFile(generateSummary(), pathToSummaryFile);
         }
-        else {
-
-        }
     }
 
-    public void initGlobalScores(){
+    public void initGlobalScores() {
         this.summaryScores.put("SOV", new ArrayList<>());
         this.summaryScores.put("SOV_H", new ArrayList<>());
         this.summaryScores.put("SOV_E", new ArrayList<>());
@@ -150,7 +144,7 @@ public class ValidateGOR {
             double totalSov = 0;
             int totalNi = 0;
 
-            for (char secType : secStructs) {
+            for (char secType : SEC_STRUCTS) {
                 double rightSum = 0.0;
                 int ni = 0;
 
@@ -159,8 +153,7 @@ public class ValidateGOR {
                     if (segment.getSecStruct() == secType) {
                         if (segment.getOverLaps().size() == 0) {
                             ni += segment.getAbsLength();
-                        }
-                        else {
+                        } else {
                             ni += segment.getAbsLength() * segment.getOverLaps().size();
                         }
 
@@ -230,7 +223,7 @@ public class ValidateGOR {
 
     private String buildSOVRegex() {
         StringBuilder regBuilder = new StringBuilder("(");
-        for (char c : secStructs) {
+        for (char c : SEC_STRUCTS) {
             regBuilder.append(c).append("+|");
         }
         regBuilder.deleteCharAt(regBuilder.length() - 1); // Remove last |
@@ -318,10 +311,10 @@ public class ValidateGOR {
         sb.append("Mean Protein Length:          " + meanOfProtLength + "\n");
         sb.append("Sum of Protein Length:        " + sumOfProtLength + "\n");
         sb.append("Sum of Predicted Positions:   " + sumOfPredPos + "\n\n");
-        for (String scoreType : orderOfScores) {
+        for (String scoreType : ORDER_OF_SCORES) {
             sb.append(summaryLine(scoreType, this.summaryScores.get(scoreType)));
-            if (scoreType.equals("qObs_C")){
-               sb.append("\n");
+            if (scoreType.equals("qObs_C")) {
+                sb.append("\n");
             }
         }
 
@@ -343,14 +336,14 @@ public class ValidateGOR {
         double q5 = Math.abs(calculateQuantile(values, 5));
         double q95 = Math.abs(calculateQuantile(values, 95));
         sb.append("Mean:" + "\t" + format.format(mean) + "\t");
-        sb.append("Dev:"+ "\t" + format.format(dev) + "\t");
-        sb.append("Min:"+ "\t" + format.format(min) + "\t");
-        sb.append("Max:"+ "\t" + format.format(max) + "\t");
-        sb.append("Median:"+ "\t" + format.format(med) + "\t");
-        sb.append("Quantil_25:"+ "\t" + format.format(q25) + "\t");
-        sb.append("Quantil_75:"+ "\t" + format.format(q75) + "\t");
-        sb.append("Quantil_5:"+ "\t" + format.format(q5) + "\t");
-        sb.append("Quantil_95:"+ "\t" + format.format(q95));
+        sb.append("Dev:" + "\t" + format.format(dev) + "\t");
+        sb.append("Min:" + "\t" + format.format(min) + "\t");
+        sb.append("Max:" + "\t" + format.format(max) + "\t");
+        sb.append("Median:" + "\t" + format.format(med) + "\t");
+        sb.append("Quantil_25:" + "\t" + format.format(q25) + "\t");
+        sb.append("Quantil_75:" + "\t" + format.format(q75) + "\t");
+        sb.append("Quantil_5:" + "\t" + format.format(q5) + "\t");
+        sb.append("Quantil_95:" + "\t" + format.format(q95));
         sb.append("\n");
         return sb.toString();
     }
@@ -403,12 +396,11 @@ public class ValidateGOR {
             // extract scores for clarity
             String seqId = s.getId();
 
-            for (String key: s.getStatValues().keySet()) {
+            for (String key : s.getStatValues().keySet()) {
                 double statValue = s.getStatValues().get(key);
                 if (Double.isNaN(statValue)) {
                     stringValues.put(key, "-");
-                }
-                else {
+                } else {
                     stringValues.put(key, format.format(statValue));
                 }
             }
@@ -440,12 +432,11 @@ public class ValidateGOR {
             HashMap<String, String> stringValues = new HashMap<>();
             // extract scores for clarity
 
-            for (String key: s.getStatValues().keySet()) {
+            for (String key : s.getStatValues().keySet()) {
                 double statValue = s.getStatValues().get(key);
                 if (Double.isNaN(statValue)) {
                     stringValues.put(key, "0");
-                }
-                else {
+                } else {
                     stringValues.put(key, format.format(statValue));
                 }
             }
@@ -466,7 +457,7 @@ public class ValidateGOR {
 
     public void writeToFile(String content, String pathOfFile) throws IOException {
         try (BufferedWriter buf = new BufferedWriter(new FileWriter(pathOfFile))) {
-                buf.write(content);
+            buf.write(content);
         } catch (IOException e) {
             e.printStackTrace();
         }
