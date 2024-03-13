@@ -105,11 +105,14 @@ public class GORMain {
         for (Sequence sequence : predictions) {
             StringBuilder seqBuilder = new StringBuilder(sequence.getSsSequence());
 
-            for (int i = Constants.WINDOW_SIZE.getValue() / 2; i < seqBuilder.length() - Constants.WINDOW_SIZE.getValue() / 2; i++) {
+            for (int i = Constants.WINDOW_SIZE.getValue() / 2; i < seqBuilder.length() - Constants.WINDOW_SIZE.getValue() / 2 - 1; i++) {
                 if (seqBuilder.charAt(i) != seqBuilder.charAt(i - 1) &&
                         seqBuilder.charAt(i) != seqBuilder.charAt(i + 1) &&
                         seqBuilder.charAt(i - 1) == seqBuilder.charAt(i + 1)) {
                     seqBuilder.setCharAt(i, seqBuilder.charAt(i - 1));
+                } else if (seqBuilder.charAt(i) != seqBuilder.charAt(i - 1) &&
+                        seqBuilder.charAt(i) != seqBuilder.charAt(i + 1)) {
+                    seqBuilder.setCharAt(i, 'C'); // Default C, cause highest std. prob.
                 }
             }
             sequence.setSsSequence(seqBuilder.toString());
