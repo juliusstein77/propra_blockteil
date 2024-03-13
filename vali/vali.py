@@ -94,9 +94,9 @@ def create_folds(folds: int, file: str):
 
 
 def crossvalidate(folds: int, run_id: str, gor: list[int], name_of_db: str):
-    for model in tqdm(gor, desc='Models', leave=False):
+    for model in gor:
         paths_of_summary = []
-        for fold in tqdm(range(1, folds + 1), desc='Folds'):
+        for fold in range(1, folds + 1):
             command = ["java", "-jar", "JARS/trainPredict.jar", 
                        "--model",  f"models/gor{model}_fold{fold}_{run_id}.mod",
                        "--seq", f"{TEST_DIR}/fasta_test_{fold}.fasta",
@@ -123,9 +123,9 @@ def crossvalidate(folds: int, run_id: str, gor: list[int], name_of_db: str):
 
 
 def crossvalidate_gor_v(folds: int, run_id: str, gor: list[int], name_of_db: str):
-    for model in tqdm(gor, desc='Models', leave=False):
+    for model in gor:
         paths_of_summary = []
-        for fold in tqdm(range(1, folds + 1), desc='Folds'):
+        for fold in range(1, folds + 1):
             command = ["java", "-jar", "JARS/trainPredict.jar", 
                        "--model",  f"models/gor5_{model}_fold{fold}_{run_id}.mod", 
                        "--maf", "train/CB513MultipleAlignments/",  # hard coded, we only have that 
