@@ -60,6 +60,10 @@ def execute_subprocess(alignment_data, dwnl):
             f.write(alignment_data['mat'].decode('utf-8'))
         command.append("--m")
         command.append('temp_mat.mat') 
+    
+    mx_path='/home/h/hummelj/public_html/cgi-bin/api'
+    command.append("--dpmatrices")
+    command.append(mx_path)
  
 
 
@@ -74,12 +78,14 @@ def execute_subprocess(alignment_data, dwnl):
             res_outpath = f'{seq}-ali-validation_results.txt'
             with open(res_outpath, 'w') as f:
                 f.write(result.stdout)
-
             res_outpath = f'../cgi-bin/api/{res_outpath}'
+            mx_path = f'../cgi-bin/api/dpmatrices_result.txt'
+
+            
 
             return {
                 'success': True,
-                'output': {'alignment results': res_outpath, 'dp matrices': 'PLACEHOLDER'},
+                'output': {'alignment results': res_outpath, 'dp matrices': mx_path},
             }
         else:
             return {

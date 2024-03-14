@@ -2,7 +2,7 @@ function loadSearchResult(args) {
     //console.log("success ", args)
     const fd = new FormData();
     fd.append('query', args);
-    fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/search.py', {
+    fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/search.py?mode=query', {
         method: 'POST',
         body: fd
     })
@@ -22,5 +22,22 @@ function loadSearchResult(args) {
     
     
     });
+}
+
+function to_json(data){
+    var json = {};
+    var data = data.split('>');
+    for (let i = 1; i < data.length; i++) {
+        var sequence = data[i].split('\n');
+        const id = sequence[0].trim();
+        let pred = {};
+        for (let j = 1; j < sequence.length-1; j++) {
+            const bin = sequence[j].split(' ');
+            pred[bin[0]] = bin[1];
+        }
+        json[id] = pred;
+
+    }
+    return json;
 }
 

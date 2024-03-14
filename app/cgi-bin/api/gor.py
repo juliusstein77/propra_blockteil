@@ -157,7 +157,71 @@ def execute_analytics_subprocess(ana_data):
 
 
 
+def execute_train_predict_subprocess(train_pred_gor_data):
+    command = ["java", "-jar", "/home/h/hummelj/propra/gor/train/JARS/trainPredNew.jar"]
+    if train_pred_gor_data['train_f']:
+        with open('temp_train.fasta', 'w') as f:
+            f.write(train_pred_gor_data['train_f'].decode('utf-8'))
+        train = 'temp_train.fasta'
+    else:
+        train = '/home/h/hummelj/propra/gor/training/train_1.txt'
+    command.append("--db")
+    command.append(train)
 
+    with open('temp_pred.fasta', 'w') as f:
+        f.write(train_pred_gor_data['pred_f'].decode('utf-8'))
+    command.append("--seq")
+    command.append('temp_pred.fasta')
+
+    command.append("--format")
+    command.append("txt")
+
+
+
+
+    
+    if train_pred_gor_data['gor_1'] == "true":
+        version = "gor1"
+    elif train_pred_gor_data['gor_3'] == "true":
+        version = "gor3"
+    elif train_pred_gor_data['gor_4'] == "true":
+        version = "gor4"
+    command.append("--method")
+    command.append(version)
+    dt = datetime.datetime.now()
+    seq = int(dt.strftime("%Y%m%d%H%M%S"))
+    v_num = version[-1]
+    model_name = f'{seq}_gor_{v_num}_w_{v_num}.mod'
+    command.append("--model")
+    command.append(f'models/{model_name}')
+    command.append("--modelT")
+    command.append(f'models/{model_name}')
+    
+    if train_pred_gor_data['w'] != "":
+        command.append("--w")
+        command.append(train_pred_gor_data['w'])
+
+    command.append("--out")
+    command.append(f'predictions/{seq}_gor_{v_num}_w_{v_num}.prd')
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+  
+    if train_pred_gor_data['train_f']:
+        os.remove('temp_train.fasta')
+    os.remove('temp_pred.fasta')
+    outpath = f'../cgi-bin/api/predictions/{seq}_gor_{v_num}_w_{v_num}.prd'
+
+    if result.returncode == 0:
+        return {
+        'success': True,
+        'output': outpath,
+        'command': command
+        	} 
+    else:
+        return {
+            'success': False,
+            'error': result.stderr
+        }
+    
     
 
 
@@ -192,6 +256,22 @@ def main():
                 'gor_4': form.getvalue('gor_4'),
             }
             result = {'data': execute_train_subprocess(gor_data)}
+        elif mode == 'train_predict':
+            default_data = form.getvalue('default_data')
+            if not default_data:
+                train_f = form['train_f'].file.read()
+            else:
+                train_f = None
+            gor_data = {
+                'train_f': train_f,
+                'pred_f': form['pred_f'].file.read(),
+                'gor_1': form.getvalue('gor_1'),
+                'gor_3': form.getvalue('gor_3'),
+                'gor_4': form.getvalue('gor_4'),
+                'w': form.getvalue('w'),
+            }
+            result = {'data': execute_train_predict_subprocess(gor_data)}
+            #result = {'data': {'w': form.getvalue('w'), 'gor_1': form.getvalue('gor_1'), 'gor_3': form.getvalue('gor_3'), 'gor_4': form.getvalue('gor_4')}}
         elif mode == 'validate':
             val_data = {
                 'pred_v': form['pred_v'].file.read(),

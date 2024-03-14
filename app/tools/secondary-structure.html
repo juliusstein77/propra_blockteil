@@ -150,7 +150,7 @@
         .then(response => response.json())
         .then(data => {
             const output = data['data']['output']
-            show_model_link(output);
+            show_model_link(output, 'trainOutput');
         })
         .catch(error => {
             console.error("Error:", error);
@@ -162,8 +162,45 @@
 
        }
 
-       function show_model_link(data){
-        var output = document.getElementById('trainOutput');
+
+       function train_predict_gor(event){
+        event.preventDefault();
+        let run = document.getElementById('run_button_tp')
+        let loading = document.getElementById('loading_tp')
+        run.className = 'text-blue-300 text-xs font-semibold cursor-not-allowed';
+        loading.style.display = 'inline-block';
+        const form_data = new FormData();
+        form_data.append('default_data', document.getElementById('default_datatp').checked);
+        if (document.getElementById('trainp_f').files.length != 0){
+            form_data.append('train_f', document.getElementById('trainp_f').files[0]);
+        }
+        form_data.append('gor_1', document.getElementById('gor_1tp').checked);
+        form_data.append('gor_3', document.getElementById('gor_3tp').checked);
+        form_data.append('gor_4', document.getElementById('gor_4tp').checked);
+        form_data.append('pred_f', document.getElementById('predp_f').files[0]);
+        form_data.append('w', document.getElementById('w_tp').value);
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/gor.py?mode=train_predict', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            const output = data['data']['output']
+            show_model_link(output, 'trainPredictOutput');
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        })
+        .finally(() => {
+            run.className = 'lnk text-xs font-semibold';
+            loading.style.display = 'none';
+        });
+       }
+
+
+       function show_model_link(data, tag){
+        var output = document.getElementById(tag);
         if (output.hasChildNodes()) {
                     output.innerHTML = '';
                 }
@@ -298,12 +335,78 @@
         });
     }
 
+    function run_sl(event) {
+        event.preventDefault();
+        let run = document.getElementById('run_button_sl')
+        let loading = document.getElementById('loading_sl')
+        run.classList.add('text-blue-300', 'text-xs', 'font-semibold', 'cursor-not-allowed');
+        loading.classList.remove('hidden');
+        loading.classList.add('inline-block', 'text-xs', 'font-semibold', 'txt-lgt', 'italic');
+        const form_data = new FormData();
+        form_data.append('pdbId', document.getElementById('pdbId').value);
+        if (document.getElementById('pdbId_f').files.length != 0){
+            form_data.append('pdbId_f', document.getElementById('pdbId_f').files[0]);
+        }
+        fetch('http://bioclient1.bio.ifi.lmu.de/~hummelj/cgi-bin/api/search.py?mode=seclib', {
+        method: 'POST',
+        body: form_data
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            const output = data['data']['output']
+            show_download_link({'seclib file': output}, 'slOutput');
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        })
+        .finally(() => {
+            run.classList.remove('text-blue-300', 'text-xs', 'font-semibold', 'cursor-not-allowed');
+            run.classList.add('lnk', 'text-xs', 'font-semibold');
+            loading.classList.remove('inline-block', 'text-xs', 'font-semibold', 'txt-lgt', 'italic');
+            loading.classList.add('hidden');    
+        });
+    }
+
+
+
     </script>
    
 </head>
 <body class='bg-gray-50'>
 
     <div id="header"></div>
+
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-col gap-2">
+                <div class="flex flex-row">
+                    <p class="text-xs font-semibold txt-lgt italic ">Generate Seclib:</p>
+                </div>
+                <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-2 ">
+                    <input type="text" id="pdbId" placeholder='"<pbdID 1>" "<pbdID 2>" ...' class="bg-gray-50 border border-gray-300 rounded-lg p-0.5 text-xs text-center w-1/2">
+                    <input type="file" id="pdbId_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                </div>
+            </div>
+                      
+        </div>       
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <p id="loading_sl" class="hidden" class="hidden">Loading...</p>
+            <button id="run_button_sl" onclick="run_sl(event)"><p class="lnk text-xs font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">&#9989; Enter PDB IDs, PDB Files, DSSP Files and directories to extract all information into a Seclib to train your GOR.</p>
+            <br>
+            <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: PDB IDs, PDB Files, DSSP Files, Directories containing those.</p>
+            <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: Seclib file for your GOR Training.</p>
+        </div> 
+    </div>
+    <div id="slOutput"></div>
 
     <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
         <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
@@ -344,7 +447,7 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <p id="loading_t" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <p id="loading_t" class="hidden" class="hidden">Loading...</p>
             <button id="run_button_t" onclick="train_gor(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
@@ -385,7 +488,7 @@
        
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <p id="loading_p" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <p id="loading_p" class="hidden" class="hidden">Loading...</p>
             <button id="run_button_p" onclick="run_gor(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
@@ -399,6 +502,86 @@
         </div> 
     </div>
     <div id="predictionOutput"></div>
+
+    <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
+        <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
+            
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-row items-start justify-start ">
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-row">
+                        <p class="text-xs font-semibold txt-lgt italic ">Training data:</p>
+                    </div>
+                    <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                        <label class="text-xs font-normal text-gray-600" for="default_datatp">Use CB513</label>
+                        <input type="checkbox" id="default_datatp" class="w-3 h-3">
+                        <input type="file" id="trainp_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-row">
+                        <p class="text-xs font-semibold txt-lgt italic ">Version:</p>
+                    </div>
+                    <div class="flex flex-row items-cente justify-start gap-2 rounded-lg px-4 py-0.5 mt-2 h-8">
+                        <div class="flex flex-row items-center gap-1">
+                            <label class="text-xs font-normal text-gray-600" for="gor_1tp">GOR 1</label>
+                            <input class="w-3 h-3" type="checkbox" id="gor_1tp" name="gorGroup">
+                        </div>
+                        
+                        <div class="flex flex-row items-center gap-1">
+                            <label class="text-xs font-normal text-gray-600" for="gor_3tp">GOR 3</label>
+                            <input class="w-3 h-3" type="checkbox" id="gor_3tp" name="gorGroup">  
+                        </div>
+                        
+                        <div class="flex flex-row items-center gap-1">
+                            <label class="text-xs font-normal text-gray-600" for="gor_4tp">GOR 4</label>
+                            <input class="w-3 h-3" type="checkbox" id="gor_4tp" name="gorGroup">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-6/12 rounded-lg bg-transparent px-4 py-2 flex flex-row items-start justify-start ">
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-row">
+                        <p class="text-xs font-semibold txt-lgt italic ">Input sequences:</p>
+                    </div>
+                    <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                        <input type="file" id="predp_f" class="bg-transparent rounded-lg px-4 py-2 w-1/2">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-row">
+                        <p class="text-xs font-semibold txt-lgt italic ">Window size (optional):</p>
+                    </div>
+                    <div class="flex flex-row items-center justify-start gap-2 rounded-lg px-4 py-2 ">
+                        <label class="text-xs font-normal text-gray-600" for="w_tp">Default = 17</label>
+                        <input class="w-8 h-5 bg-gray-50 border border-gray-300 rounded-lg p-0.5 text-xs text-center" type="text" id="w_tp" name="w_tp">
+                    </div>
+                </div>
+            </div>              
+        </div>
+
+       
+
+        <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
+            <p id="loading_tp" class="hidden" class="hidden">Loading...</p>
+            <button id="run_button_tp" onclick="train_predict_gor(event)"><p class="lnk text-xs font-semibold">Run</p></button>
+        </div>
+
+        <div class="w-full h-0.5 bg-txt-lgt-mx rounded-full"></div>
+           
+        <div class="w-full flex flex-row items-center justify-start gap-4 rounded-lg">
+            <p class="text-xs font-normal txt-lgt">&#128640; The script trains and predicts in one call. You can modify the Window Length in this script (17 is default)</p>
+            <br>
+            <p class="text-xs font-normal txt-lgt"><span style="color: green;"><b>Input</b></span>: Seclib-File to train your data; Optional: Window size as <u>uneven Integers</u>. Upload Sequence File (FASTA) for your prediction.</p>
+            <p class="text-xs font-normal txt-lgt"><span style="color: red;"><b>Output</b></span>: Prediction-File (.prd)</p>
+        </div> 
+    </div>
+    <div id="trainPredictOutput"></div>
+
+
+
+
+
 
     <div class="flex flex-col justify-start items-start w-full gap-2 rounded-lg box p-4 mt-4">
         <div class="w-full flex flex-row items-center justify-between gap-4 rounded-lg">
@@ -421,7 +604,7 @@
         </div>
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <p id="loading_v" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <p id="loading_v" class="hidden" class="hidden">Loading...</p>
             <button id="run_button_v" onclick="run_vali(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
@@ -452,7 +635,7 @@
         </div>
 
         <div class="w-full flex flex-row items-center justify-end gap-4 rounded-lg px-4 py-2">
-            <p id="loading_a" class="hidden" class="txt-lgt text-xs font-semibold">Loading...</p>
+            <p id="loading_a" class="hidden" class="hidden">Loading...</p>
             <button id="run_button_a" onclick="run_ana(event)"><p class="lnk text-xs font-semibold">Run</p></button>
         </div>
 
@@ -499,7 +682,7 @@
                     <b>GOR I</b>
                 </h1>
                 <div>
-                    GOR I models contain the SearchWindow length (17 by default) times the number of standard amino acids (20) times the number of secondary structure types (3) entries (340 entries by default). The Searchwindow then goes over the sequence and predicts the respective structure for the center of the window using the highest probability in the window.
+                    GOR I models contain the SearchWindow length (17 by default) times the number of standard amino acids (20) times the number of secondary structure types (3) entries (1020 entries by default). The Searchwindow then goes over the sequence and predicts the respective structure for the center of the window using the highest probability in the window.
                 </div>
                 <div>
                         <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/gor1-1.webp" alt="">
@@ -612,10 +795,10 @@
             </style>
             <div id="data_analysis">
                 <div class="plot">
-                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/cb513_occs.png" alt="CB513, GOR1, CV">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/cb513_seqs_ss_ocs.png" alt="CB513, GOR1, CV">
                 </div>
                 <div class="plot">
-                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/filtered_seqs_ss_ocs.png" alt="CB513, GOR3, CV">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/723K_filtered_seqs_ss_ocs.png" alt="CB513, GOR3, CV">
                 </div>
                 <div class="plot">
                     <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/hm_cb513.png" alt="CB513, GOR1, CV">
@@ -679,7 +862,15 @@
                 <div class="video-container">
                     <iframe width="560" height="315" src="https://www.youtube.com/embed/xVWeRnStdSA" frameborder="0" allowfullscreen></iframe>
                 </div>                  
-
+                <br>
+                <b>That's why:</b>
+                <br>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/res.png" alt="CB513, GOR1, CV">
+                </div>
+                <div class="plot">
+                    <img src="http://bioclient1.bio.ifi.lmu.de/~hummelj/public/unfiltered_seqs_ss_ocs.png" alt="CB513, GOR3, CV">
+                </div>
             </div>
         </div>
     </div>

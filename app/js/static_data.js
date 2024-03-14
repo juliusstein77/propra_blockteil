@@ -6,14 +6,15 @@ export var group_profiles = [
 ];
 
 export var ifi_profiles = [
-    { name: "Prof. Ralf Zimmer"},
-    { name: "Dr. Evi Berchtold"},
-    { name: "Elena Weiß"},
-    { name: "Armin Hadziahmetovic"}
+    { name: "Prof. Ralf Zimmer", link: "https://www.bio.ifi.lmu.de/mitarbeiter/ralf-zimmer/"},
+    { name: "Dr. Evi Berchtold", link: "https://www.bio.ifi.lmu.de/mitarbeiter/evi-berchtold/index.html"},
+    { name: "Elena Weiß", link: "https://www.bio.ifi.lmu.de/mitarbeiter/elena-weiss/index.html"},
+    { name: "Armin Hadziahmetovic", link: "https://www.bio.ifi.lmu.de/mitarbeiter/armin-hadziahmetovic/index.html"}
 ];
 
 export var links = [
     { name: "LMU Gitlab", link:"https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3"},
     { name: "Report card", link:"https://docs.google.com/spreadsheets/d/1e-2aziQAUbwPtcy_ziBT2Ba_VHlZe0w1q-kbK7Bz-Yk/edit#gid=611133691"},
-    { name: "Website code", link:"https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/webserver?ref_type=heads"}
+    { name: "Website code", link:"https://gitlab2.cip.ifi.lmu.de/bio/propra_ws23/hummelj/blockgruppe3/-/tree/webserver?ref_type=heads"},
+    { name: "Zimmers Zimmer", link:"https://www.lmu.de/raumfinder/#/building/bw1020/map?room=102004401_"}
 ];
