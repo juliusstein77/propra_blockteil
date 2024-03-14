@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import utils.CmdParser;
 import utils.Helpers;
@@ -12,14 +13,29 @@ import utils.SeqLibReader;
 
 public class Runner {
 
-    public static void printMatrixToFile(double[][] matrix, String filename) throws IOException {
+    public static String resultFile;
+
+    public static ArrayList<double[][]> dpMatrices = new ArrayList<>();
+    public static ArrayList<String> matrixNames = new ArrayList<>();
+
+    public static void printMatrixToFile(ArrayList<double[][]> matrices, ArrayList<String> names, String filename) throws IOException {
         FileWriter writer = new FileWriter(filename);
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[0].length; j++) {
-                writer.write(matrix[i][j] + "\t");
+        for (int k = 0; k < matrices.size(); k++) {
+            writer.write(">" + names.get(k) + "\n");
+            double[][] matrix = matrices.get(k);
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[0].length; j++) {
+                    writer.write(matrix[i][j] + "\t");
+                }
+                writer.write("\n");
             }
-            writer.write("\n");
         }
+        writer.close();
+    }
+
+    public static void printResults(String result, String filename) throws IOException {
+        FileWriter writer = new FileWriter(filename);
+        writer.write(result);
         writer.close();
     }
 
@@ -36,6 +52,7 @@ public class Runner {
         parser.addOption("dpmatrices", false);
         parser.addSwitch("check");
         parser.addSwitch("val");
+        parser.addOption("download", false);
 
         try {
             parser.parse(args);
@@ -50,6 +67,7 @@ public class Runner {
             String dpMatricesPath = parser.getOptionValue("dpmatrices");
             boolean check = parser.getSwitchValue("check");
             boolean val = parser.getSwitchValue("val");
+            String downloadPath = parser.getOptionValue("download");
 
             //TODO: Parse all necessary command line arguments (-m with only 1 hyphen)
             //TODO: modify the output accordingly
@@ -87,10 +105,46 @@ public class Runner {
                     if (format.equals("scores")) {
                         System.out.println(pair[0] + " " + pair[1] + " " + String.format("%.4f", score).replace(",", "."));
                     } else if (format.equals("ali")) {
-                        System.out.println(">" + pair[0] + " " + pair[1] + " " + String.format("%.3f", score).replace(",", "."));
-                        for (int i = 0; i < NeedlemanWunsch.getAlignment().size(); i++) {
-                            System.out.println(pair[i] + ": " + NeedlemanWunsch.getAlignment().get(i));
+                        String alignment1 = NeedlemanWunsch.getAlignment().get(0);
+                        String alignment2 = NeedlemanWunsch.getAlignment().get(1);
+                        int matchCount = 0;
+                        int mismatchCount = 0;
+                        int totalAligned = 0;
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < alignment1.length(); i++) {
+                            char char1 = alignment1.charAt(i);
+                            char char2 = alignment2.charAt(i);
+
+                            if (char1 == char2) {
+                                sb.append("|");
+                                matchCount++;
+                                totalAligned++;
+                            } else if (char1 == '-' || char2 == '-') {
+                                sb.append("."); // Gap
+                            } else {
+                                sb.append(":"); // Mismatch
+                                mismatchCount++;
+                                totalAligned++;
+                            }
                         }
+                        double percentMatch = (double) matchCount / alignment1.length() * 100;
+                        double percentMismatch = (double) mismatchCount / alignment1.length() * 100;
+                        int whitespaceCount = pair[1].length();
+                        for (int i = 0; i < whitespaceCount; i++) {
+                            sb.insert(0, "-");
+                        }
+                        sb.insert(0, "-");
+                        sb.insert(0, "-");
+                        String s1 = ">" + pair[0] + " " + pair[1] + " " + String.format("%.3f", score).replace(",", ".") + " " + String.format("%.2f", percentMatch).replace(",", ".") + "% matches" + " " + String.format("%.2f", percentMismatch).replace(",", ".") + "% mismatches" + " " + totalAligned + " " + "total aligned" + "\n";
+                        String s2 = pair[0] + ": " + alignment1 + "\n";
+                        String s3 = sb.toString() + "\n";
+                        String s4 = pair[1] + ": " + alignment2;
+                        String result = s1 + s2 + s3 + s4;
+                        System.out.println(result);
+                        if (downloadPath != null) {
+                            resultFile = resultFile + result + "\n";
+                        }
+
                         if (val) {
                             //TODO: remove gap overhangs
                             String refSeq1 = sequenceLibrary.get(pair[0]);
@@ -113,8 +167,10 @@ public class Runner {
                     }
 
                     if (dpMatricesPath != null) {
-                        printMatrixToFile(NeedlemanWunsch.dp,dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix.txt");
+                        dpMatrices.add(NeedlemanWunsch.dp);
+                        matrixNames.add(pair[0] + "_" + pair[1]);
                     }
+
                 // Use Gotoh algorithm
                 } else {
                     HashMap<String, Double> matrix = Helpers.read_in_matrix(mFile);
@@ -133,9 +189,39 @@ public class Runner {
                         output += pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
                     } else if (format.equals("ali")) {
                         String[] stringsAligned = alignment.alignment.split("\n");
-                        output += ">" + pair[0] + " " + pair[1] + " " + (String.format("%.4f", alignment.score)).replace(",", ".") + "\n";
+                        String alignment1 = stringsAligned[0];
+                        String alignment2 = stringsAligned[1];
+                        int matchCount = 0;
+                        int mismatchCount = 0;
+                        int totalAligned = 0;
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < alignment1.length(); i++) {
+                            char char1 = alignment1.charAt(i);
+                            char char2 = alignment2.charAt(i);
+
+                            if (char1 == char2) {
+                                sb.append("|");
+                                matchCount++;
+                                totalAligned++;
+                            } else if (char1 == '-' || char2 == '-') {
+                                sb.append("."); // Gap
+                            } else {
+                                sb.append(":"); // Mismatch
+                                mismatchCount++;
+                                totalAligned++;
+                            }
+                        }
+                        double percentMatch = (double) matchCount / alignment1.length() * 100;
+                        double percentMismatch = (double) mismatchCount / alignment1.length() * 100;
+                        int whitespaceCount = pair[1].length();
+
+                        sb.insert(0, "-");
+                        sb.insert(0, "-");
+                        output += ">" + pair[0] + " " + pair[1] + " " + String.format("%.3f", score).replace(",", ".") + " " + String.format("%.2f", percentMatch).replace(",", ".") + "% matches" + " " + String.format("%.2f", percentMismatch).replace(",", ".") + "% mismatches" + " " + totalAligned + " " + "total aligned" + "\n";
                         output += pair[0] + ": " + stringsAligned[0] + "\n";
+                        output += sb.toString() + "\n";
                         output += pair[1] + ": " + stringsAligned[1] + "\n";
+
                         if (val) {
                             String refSeq1 = sequenceLibrary.get(pair[0]);
                             String refSeq2 = sequenceLibrary.get(pair[1]);
@@ -158,15 +244,27 @@ public class Runner {
                     }
 
                     if (dpMatricesPath != null) {
-                        printMatrixToFile(alignment.mx_a, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_a.txt");
-                        printMatrixToFile(alignment.mx_i, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_i.txt");
-                        printMatrixToFile(alignment.mx_d, dpMatricesPath + "/" + pair[0] + "_" + pair[1] + "_matrix_d.txt");
+                        matrixNames.add(pair[0] + "_" + pair[1] + "_matrix_a");
+                        dpMatrices.add(alignment.mx_a);
+                        matrixNames.add(pair[0] + "_" + pair[1] + "_matrix_i");
+                        dpMatrices.add(alignment.mx_i);
+                        matrixNames.add(pair[0] + "_" + pair[1] + "_matrix_d");
+                        dpMatrices.add(alignment.mx_d);
                     }
 
                     // Print alignment results
                     System.out.println(output);
+                    if (downloadPath != null) {
+                        resultFile = resultFile + output + "\n";
+                    }
                 }
 
+            }
+            if (downloadPath != null) {
+                printResults(resultFile, downloadPath + "/alignment_results.txt");
+            }
+            if (dpMatricesPath != null) {
+                printMatrixToFile(dpMatrices, matrixNames, dpMatricesPath + "/dpmatrices_result.txt");
             }
 
         } catch (IOException e) {

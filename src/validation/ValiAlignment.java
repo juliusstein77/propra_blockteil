@@ -9,6 +9,16 @@ public class ValiAlignment {
     static ArrayList<AlignmentPairs> predAlignmentPairs;
     static ArrayList<AlignmentPairs> refAlignmentPairs;
 
+    // check if the target sequence is aligned
+    public static boolean isTargetAligned(AlignmentPairs a, AlignmentPairs b) {
+        return a.charSeq2 == b.charSeq2 && a.countSeq2 == b.countSeq2;
+    }
+
+    // check if the alignment pairs are identical
+    public static boolean isIdentical(AlignmentPairs a, AlignmentPairs b) {
+        return a.charSeq1 == b.charSeq1 && a.charSeq2 == b.charSeq2 && a.countSeq1 == b.countSeq1 && a.countSeq2 == b.countSeq2;
+    }
+
     // Initialize the alignment pairs from the predicted and reference alignment sequences (String[])
     public static void initializeAlignment (String[] predictedAlignment, String[] referenceAlignment) {
 
@@ -35,15 +45,7 @@ public class ValiAlignment {
                 int actualPositionPredSeq2 = Math.max(i-occPred2.getOrDefault('-',0),0);
                 // Add the alignment pair to the list
                 predAlignmentPairs.add(
-                        new AlignmentPairs(
-                                predSeq1.charAt(i),
-                                predSeq2.charAt(i),
-                                i,
-                                actualPositionPredSeq1,
-                                actualPositionPredSeq2,
-                                occPred1.get(predSeq1.charAt(i)),
-                                occPred2.get(predSeq2.charAt(i))
-                        ));
+                        new AlignmentPairs(predSeq1.charAt(i), predSeq2.charAt(i), i, actualPositionPredSeq1, actualPositionPredSeq2, occPred1.get(predSeq1.charAt(i)), occPred2.get(predSeq2.charAt(i))));
             }
         }
 
@@ -61,15 +63,7 @@ public class ValiAlignment {
                 int actualPositionRefSeq2 = Math.max(i-occRef2.getOrDefault('-',0),0);
                 // Add the alignment pair to the list
                 refAlignmentPairs.add(
-                        new AlignmentPairs(
-                                refSeq1.charAt(i),
-                                refSeq2.charAt(i),
-                                i,
-                                actualPositionRefSeq1,
-                                actualPositionRefSeq2,
-                                occRef1.get(refSeq1.charAt(i)),
-                                occRef2.get(refSeq2.charAt(i))
-                        ));
+                        new AlignmentPairs(refSeq1.charAt(i), refSeq2.charAt(i), i, actualPositionRefSeq1, actualPositionRefSeq2, occRef1.get(refSeq1.charAt(i)), occRef2.get(refSeq2.charAt(i))));
             }
         }
     }
@@ -96,11 +90,11 @@ public class ValiAlignment {
     public static double calculateInverseMeanShiftError() {
         ArrayList<Integer> inverseShifts = new ArrayList<>();
         for (AlignmentPairs refali : refAlignmentPairs){
-            int index1 = refali.actualIndexSeq1;
-            int index2 = refali.actualIndexSeq2;
+            int refTemplateIndex = refali.actualIndexSeq1;
+            int refTargetIndex = refali.actualIndexSeq2;
             for (AlignmentPairs predali : predAlignmentPairs) {
-                if (predali.actualIndexSeq1 == index1) {
-                    int shift = predali.actualIndexSeq2 - index2;
+                if (predali.actualIndexSeq1 == refTemplateIndex) {
+                    int shift = predali.actualIndexSeq2 - refTargetIndex;
                     inverseShifts.add(Math.abs(shift));
                 }
             }
@@ -165,14 +159,5 @@ public class ValiAlignment {
         }
         double specificity = (double) correctAligned / (double) predAlignmentPairs.size();
         return specificity;
-    }
-
-
-    public static boolean isTargetAligned(AlignmentPairs a, AlignmentPairs b) {
-        return a.charSeq2 == b.charSeq2 && a.countSeq2 == b.countSeq2;
-    }
-
-    public static boolean isIdentical(AlignmentPairs a, AlignmentPairs b) {
-        return a.charSeq1 == b.charSeq1 && a.charSeq2 == b.charSeq2 && a.countSeq1 == b.countSeq1 && a.countSeq2 == b.countSeq2;
     }
 }
